@@ -2226,20 +2226,24 @@ function buildFWTable() {
     const tc       = d.tc||0;       // Tech GPS installations count
     const ost      = d.ost||0;      // Outstation trips
 
+    // BGT001 (owner) — counts devices but earns NO commission, no office pool contribution
+    const NO_COMM_IDS = ['BGT001'];
+    const isNoComm = NO_COMM_IDS.includes(e.id);
+
     // Individual commission for tech
-    const ecTech   = ec * 400;      // ₹400/engcut for tech
-    const ecOff    = ec * 100;      // ₹100/engcut for office pool
-    const ostAmt   = ost * halfDay; // outstation
+    const ecTech   = isNoComm ? 0 : ec * 400;      // ₹400/engcut for tech
+    const ecOff    = isNoComm ? 0 : ec * 100;      // ₹100/engcut for office pool
+    const ostAmt   = isNoComm ? 0 : ost * halfDay; // outstation
 
     // Topper: based on this employee's tech GPS count
-    const topperTotal  = tc >= 30 ? tc * 100 : 0;
+    const topperTotal  = (!isNoComm && tc >= 30) ? tc * 100 : 0;
     const topperTech   = Math.round(topperTotal * 0.70);
     const topperOff    = Math.round(topperTotal * 0.30);
 
     const techEarned   = ecTech + topperTech + ostAmt;
     const officeShare  = ecOff + topperOff;
 
-    // Accumulate totals
+    // Accumulate totals — counts always included, commission skipped for NO_COMM_IDS
     totMT          += mt;
     totEC          += ec;
     totTechCount   += tc;
@@ -2810,11 +2814,14 @@ function recalcFWRow(empId, key, workDays, halfDay) {
   const tc  = vals[2]||0;
   const ost = vals[3]||0;
 
-  const ecTech     = ec * 400;
-  const topTotal   = tc >= 30 ? tc * 100 : 0;
+  const NO_COMM_IDS = ['BGT001'];
+  const isNoComm = NO_COMM_IDS.includes(empId);
+
+  const ecTech     = isNoComm ? 0 : ec * 400;
+  const topTotal   = (!isNoComm && tc >= 30) ? tc * 100 : 0;
   const topTech    = Math.round(topTotal * 0.70);
-  const ostAmt     = ost * halfDay;
-  const techEarned = ecTech + topTech + ostAmt; // mt has no commission
+  const ostAmt     = isNoComm ? 0 : ost * halfDay;
+  const techEarned = ecTech + topTech + ostAmt; // mt has no commission, BGT001 has no commission
 
   const set = (id, html, color) => {
     const el = document.getElementById(id+'-'+empId);
@@ -2889,11 +2896,15 @@ function _applyFWCommissions(key) {
   Object.entries(mFW).forEach(([k,d])=>{ if(!k.startsWith('_')) totalGPS+=(d.mt||0)+(d.tc||0); });
   const officeActive = totalGPS > 200;
 
+  const NO_COMM_IDS = ['BGT001']; // Owner — counts GPS but no commission
   Object.entries(mFW).forEach(([empId,d]) => {
     if(empId.startsWith('_')) return;
     const e = emps.find(x=>x.id===empId); if(!e) return;
+    const isNoComm = NO_COMM_IDS.includes(empId);
     const halfDay = 300; // Fixed ₹300 per outstation trip
     const mt=d.mt||0, ec=d.ec||0, tc=d.tc||0, ost=d.ost||0;
+    // Skip all commission calculation for NO_COMM_IDS
+    if(isNoComm) return;
     const topTotal = tc>=30 ? tc*100 : 0;
     const topTech  = Math.round(topTotal*0.70);
     const topOff   = Math.round(topTotal*0.30);
