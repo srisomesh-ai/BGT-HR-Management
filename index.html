@@ -2264,7 +2264,7 @@ function buildFWTable() {
 
   // Total office pool
   const totalOfficePool = totECOff + totTopperOff;
-  const OFFICE_NAMES    = ['lohitha','tanuja','manoj'];
+  const OFFICE_NAMES    = ['lohitha','tanuja','raghvendra'];
   const officeStaff     = emps.filter(e => OFFICE_NAMES.some(n=>e.name.toLowerCase().includes(n)));
   const perOfficeStaff  = officeActive && officeStaff.length>0
     ? Math.round(totalOfficePool / officeStaff.length)
@@ -2437,7 +2437,7 @@ function buildFWTable() {
         <span class="badge ${officeActive?'badge-green':'badge-gray'}">₹${fmtN(perOfficeStaff)}</span>
       </div>`).join('')}
     </div>`
-    :`<div style="font-size:13px;color:var(--text3);">Office staff (Lohitha, Tanuja, Manoj) will appear here once matched.</div>`}
+    :`<div style="font-size:13px;color:var(--text3);">Office staff (Lohitha, Tanuja, Raghvendra) will appear here once matched.</div>`}
   </div>
 
   <!-- ACTION BUTTONS -->
@@ -2886,7 +2886,7 @@ function _applyFWCommissions(key) {
   // ost: outstation trips → trips × half-day
   // office bonus only if total GPS (mt+ec+tc) > 200
 
-  const OFFICE_NAMES = ['lohitha','tanuja','manoj'];
+  const OFFICE_NAMES = ['lohitha','tanuja','raghvendra'];
   const officeStaff  = emps.filter(e =>
     e.status==='active' && OFFICE_NAMES.some(n=>e.name.toLowerCase().includes(n))
   );
