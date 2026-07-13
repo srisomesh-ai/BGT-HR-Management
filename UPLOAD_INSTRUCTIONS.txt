@@ -1,0 +1,63 @@
+=======================================================
+ BHARAT GPS TRACKER — HR SYSTEM — UPLOAD INSTRUCTIONS
+=======================================================
+
+FILES IN THIS ZIP:
+  index.html              ← Main HR application
+  hr-api/data.php         ← PHP data storage backend
+  hr-api/storage/         ← Data folder (must be writable)
+
+=======================================================
+STEP-BY-STEP UPLOAD (Hostinger / cPanel)
+=======================================================
+
+OPTION A: Just the HTML file (simplest — works on any host)
+-----------------------------------------------------------
+1. Upload index.html to your server folder
+   e.g. public_html/hr/index.html
+2. Open in browser: https://yourdomain.com/hr/
+3. Data saves in each user's browser (localStorage)
+   ⚠ This means: data is per-browser, not shared across devices
+
+OPTION B: With PHP backend (RECOMMENDED — shared data)
+-----------------------------------------------------------
+1. Upload ALL files keeping the folder structure:
+     public_html/hr/index.html
+     public_html/hr/hr-api/data.php
+     public_html/hr/hr-api/storage/   (empty folder)
+
+2. Set storage folder permissions to 755:
+     In Hostinger File Manager → right-click storage/ → Permissions → 755
+     OR via SSH: chmod 755 public_html/hr/hr-api/storage/
+
+3. Edit index.html — find this line near top of <script>:
+     const API_BASE = '';
+   Change it to your actual URL:
+     const API_BASE = 'https://yourdomain.com/hr/hr-api';
+
+4. Re-upload the edited index.html
+
+5. Open: https://yourdomain.com/hr/
+   ✅ All 3 users now share the same live data from any device
+
+=======================================================
+LOGIN CREDENTIALS
+=======================================================
+  Manager   : manager  / 1234
+  Accounts  : accounts / 1234
+  Admin     : admin    / 1234
+
+To change passwords: open index.html, find the USERS object:
+  const USERS = {
+    manager:  {pass:'1234', ...},
+    accounts: {pass:'1234', ...},
+    admin:    {pass:'1234', ...},
+  };
+
+=======================================================
+ADMIN ATTENDANCE AMENDMENT CODE: 532842
+=======================================================
+Keep this code confidential. Only Admin can amend
+locked attendance entries using this code.
+
+=======================================================

@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BharatGPS — Employee Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════
+   CSS VARIABLES — LIGHT PROFESSIONAL THEME
+   ════════════════════════════════════════════ */
+:root {
+  --bg:        #f5f6fa;
+  --bg2:       #eef0f6;
+  --surface:   #ffffff;
+  --surface2:  #f9fafc;
+  --border:    #e2e5ef;
+  --border2:   #d0d4e4;
+
+  --text:      #0f1629;
+  --text2:     #4a5272;
+  --text3:     #8b93b0;
+  --text4:     #b4bace;
+
+  --primary:   #1c3faa;
+  --primary2:  #2550d4;
+  --primary-bg:#eef2ff;
+  --primary-border:#c7d2fe;
+
+  --accent:    #0ea5c4;
+  --accent-bg: #e0f7fc;
+
+  --green:     #0d9e6a;
+  --green-bg:  #dcfdf0;
+  --green-border:#a3f0cc;
+
+  --red:       #d63b3b;
+  --red-bg:    #fef2f2;
+  --red-border:#fca5a5;
+
+  --amber:     #b45309;
+  --amber-bg:  #fffbeb;
+  --amber-border:#fcd34d;
+
+  --orange:    #c2600a;
+  --orange-bg: #fff7ed;
+
+  --purple:    #6d28d9;
+  --purple-bg: #f5f3ff;
+
+  --shadow-xs: 0 1px 3px rgba(15,22,41,0.06), 0 1px 2px rgba(15,22,41,0.04);
+  --shadow-sm: 0 2px 8px rgba(15,22,41,0.07), 0 1px 3px rgba(15,22,41,0.05);
+  --shadow-md: 0 4px 16px rgba(15,22,41,0.09), 0 2px 6px rgba(15,22,41,0.06);
+  --shadow-lg: 0 12px 40px rgba(15,22,41,0.12), 0 4px 12px rgba(15,22,41,0.07);
+  --shadow-xl: 0 24px 64px rgba(15,22,41,0.15), 0 8px 24px rgba(15,22,41,0.08);
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius:    10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  --font:      'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --mono:      'IBM Plex Mono', 'Courier New', monospace;
+
+  --sidebar-w: 256px;
+  --header-h:  60px;
+}
+
+/* ════════════════════════════════════════════
+   RESET & BASE
+   ════════════════════════════════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 15px; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+input, select, textarea, button { font-family: var(--font); }
+a { text-decoration: none; color: var(--primary); }
+
+/* ════════════════════════════════════════════
+   LOGIN SCREEN
+   ════════════════════════════════════════════ */
+#loginScreen {
+  min-height: 100vh;
+  display: flex;
+  background: var(--bg);
+}
+.login-left {
+  flex: 1;
+  background: linear-gradient(145deg, #0f1e6b 0%, #1c3faa 45%, #1a5fb4 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+  position: relative;
+  overflow: hidden;
+}
+.login-left::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.login-left-content { position: relative; z-index: 1; }
+.login-brand { display: flex; align-items: center; gap: 14px; margin-bottom: 48px; }
+.login-brand-icon {
+  width: 48px; height: 48px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; backdrop-filter: blur(10px);
+}
+.login-brand-name { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+.login-brand-sub { font-size: 11px; color: rgba(255,255,255,0.55); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
+.login-headline { font-size: 40px; font-weight: 800; color: #fff; line-height: 1.15; letter-spacing: -1px; margin-bottom: 16px; }
+.login-headline span { color: #93c5fd; }
+.login-desc { font-size: 15px; color: rgba(255,255,255,0.65); line-height: 1.7; max-width: 380px; }
+.login-features { margin-top: 40px; display: flex; flex-direction: column; gap: 12px; }
+.login-feat { display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.75); font-size: 14px; }
+.login-feat-dot { width: 6px; height: 6px; background: #93c5fd; border-radius: 50%; flex-shrink: 0; }
+
+.login-right {
+  width: 460px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 40px;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+}
+.login-form-wrap { width: 100%; max-width: 360px; }
+.login-form-title { font-size: 26px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; margin-bottom: 6px; }
+.login-form-sub { font-size: 14px; color: var(--text3); margin-bottom: 32px; }
+
+.role-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 28px; }
+.role-card {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 8px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.18s;
+  background: var(--surface);
+}
+.role-card:hover { border-color: var(--primary-border); background: var(--primary-bg); }
+.role-card.active { border-color: var(--primary); background: var(--primary-bg); box-shadow: 0 0 0 3px rgba(28,63,170,0.1); }
+.role-card .rc-icon { font-size: 22px; margin-bottom: 8px; }
+.role-card .rc-name { font-size: 11px; font-weight: 700; color: var(--text); letter-spacing: 0.5px; }
+.role-card .rc-desc { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.role-card.active .rc-name { color: var(--primary); }
+
+.lf-group { margin-bottom: 16px; }
+.lf-label { font-size: 12px; font-weight: 600; color: var(--text2); letter-spacing: 0.3px; display: block; margin-bottom: 6px; }
+.lf-input {
+  width: 100%; padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px; color: var(--text);
+  background: var(--surface);
+  transition: all 0.18s;
+  outline: none;
+}
+.lf-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(28,63,170,0.08); }
+
+.btn-login {
+  width: 100%; padding: 13px;
+  background: var(--primary);
+  color: #fff;
+  border: none; border-radius: var(--radius);
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.18s;
+  margin-top: 4px;
+  letter-spacing: 0.2px;
+}
+.btn-login:hover { background: var(--primary2); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+.login-creds { margin-top: 20px; padding: 14px; background: var(--bg); border-radius: var(--radius); border: 1px solid var(--border); }
+.login-creds-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.login-cred-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); padding: 3px 0; }
+.login-cred-row code { font-family: var(--mono); color: var(--primary); background: var(--primary-bg); padding: 1px 6px; border-radius: 3px; font-size: 11px; }
+
+/* ════════════════════════════════════════════
+   APP SHELL
+   ════════════════════════════════════════════ */
+#app { display: none; min-height: 100vh; }
+.app-wrap { display: flex; min-height: 100vh; }
+
+/* ════════════════════════════════════════════
+   SIDEBAR
+   ════════════════════════════════════════════ */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 50;
+  overflow-y: auto;
+}
+.sb-brand {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 11px;
+}
+.sb-brand-icon {
+  width: 36px; height: 36px;
+  background: var(--primary);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: #fff; flex-shrink: 0;
+}
+.sb-brand-name { font-size: 14px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+.sb-brand-sub { font-size: 10px; color: var(--text3); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 1px; }
+
+.sb-user {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface2);
+}
+.sb-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+  border: 2px solid var(--border);
+}
+.sb-user-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.sb-user-role {
+  font-size: 10px; font-weight: 700; color: var(--primary);
+  text-transform: uppercase; letter-spacing: 1px;
+  background: var(--primary-bg); padding: 2px 6px; border-radius: 3px;
+  display: inline-block; margin-top: 2px;
+}
+
+.sb-nav { padding: 12px 10px; flex: 1; }
+.sb-section-label {
+  font-size: 10px; font-weight: 700; color: var(--text3);
+  letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 0 8px; margin: 10px 0 4px;
+}
+.sb-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: all 0.14s;
+  color: var(--text2); font-size: 13.5px; font-weight: 500;
+  margin-bottom: 1px; position: relative;
+}
+.sb-item:hover { background: var(--bg); color: var(--text); }
+.sb-item.active {
+  background: var(--primary-bg);
+  color: var(--primary);
+  font-weight: 600;
+}
+.sb-item .sb-icon { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+.sb-badge {
+  margin-left: auto;
+  background: var(--red); color: #fff;
+  font-size: 10px; font-weight: 700;
+  padding: 2px 6px; border-radius: 10px;
+}
+
+.sb-footer {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+.btn-logout {
+  width: 100%; padding: 9px 14px;
+  background: transparent; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text3);
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: all 0.16s;
+}
+.btn-logout:hover { border-color: var(--red-border); color: var(--red); background: var(--red-bg); }
+
+/* ════════════════════════════════════════════
+   MAIN CONTENT AREA
+   ════════════════════════════════════════════ */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  min-height: 100vh;
+  background: var(--bg);
+}
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: var(--header-h);
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 40;
+  box-shadow: var(--shadow-xs);
+}
+.topbar-left { display: flex; align-items: center; gap: 6px; }
+.topbar-crumb { font-size: 13px; color: var(--text3); }
+.topbar-crumb-sep { color: var(--border2); margin: 0 4px; }
+.topbar-page { font-size: 14px; font-weight: 600; color: var(--text); }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.topbar-date { font-size: 12px; color: var(--text3); font-family: var(--mono); }
+.topbar-role-badge {
+  font-size: 11px; font-weight: 700;
+  padding: 4px 10px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.page-body { padding: 28px 32px 48px; }
+
+/* ════════════════════════════════════════════
+   CARDS
+   ════════════════════════════════════════════ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+}
+.card-pad { padding: 24px; }
+.card-title {
+  font-size: 11px; font-weight: 700;
+  color: var(--text3); letter-spacing: 1.2px;
+  text-transform: uppercase; margin-bottom: 16px;
+}
+
+/* STAT CARDS */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px,1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-xs);
+  position: relative; overflow: hidden;
+  transition: box-shadow 0.18s;
+}
+.stat-card:hover { box-shadow: var(--shadow-sm); }
+.stat-card-icon {
+  width: 40px; height: 40px; border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; margin-bottom: 14px;
+}
+.stat-val { font-size: 28px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; line-height: 1; }
+.stat-label { font-size: 13px; color: var(--text3); margin-top: 5px; font-weight: 500; }
+.stat-sub { font-size: 12px; margin-top: 6px; font-weight: 500; }
+.stat-up { color: var(--green); }
+.stat-down { color: var(--red); }
+
+/* ════════════════════════════════════════════
+   BUTTONS
+   ════════════════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 9px 18px; border-radius: var(--radius);
+  font-size: 13.5px; font-weight: 600;
+  cursor: pointer; border: 1px solid transparent;
+  transition: all 0.16s; white-space: nowrap; line-height: 1;
+}
+.btn-sm { padding: 7px 14px; font-size: 12.5px; border-radius: var(--radius-sm); }
+.btn-xs { padding: 5px 10px; font-size: 11.5px; border-radius: var(--radius-xs); }
+.btn-icon { padding: 8px; width: 34px; height: 34px; border-radius: var(--radius-sm); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+
+.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn-primary:hover { background: var(--primary2); border-color: var(--primary2); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+.btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border); }
+.btn-secondary:hover { background: var(--bg); border-color: var(--border2); }
+.btn-success { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
+.btn-success:hover { background: #c6f6e3; }
+.btn-danger { background: var(--red-bg); color: var(--red); border-color: var(--red-border); }
+.btn-danger:hover { background: #fee2e2; }
+.btn-amber { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
+.btn-amber:hover { background: #fef3c7; }
+.btn-accent { background: var(--accent-bg); color: var(--accent); border-color: #a5e8f5; }
+.btn-accent:hover { background: #c7f0f9; }
+
+/* ════════════════════════════════════════════
+   BADGES
+   ════════════════════════════════════════════ */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 20px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.2px;
+  border: 1px solid transparent;
+}
+.badge-green  { background: var(--green-bg);  color: var(--green);  border-color: var(--green-border); }
+.badge-red    { background: var(--red-bg);    color: var(--red);    border-color: var(--red-border); }
+.badge-amber  { background: var(--amber-bg);  color: var(--amber);  border-color: var(--amber-border); }
+.badge-blue   { background: var(--primary-bg); color: var(--primary); border-color: var(--primary-border); }
+.badge-accent { background: var(--accent-bg); color: var(--accent);  border-color: #a5e8f5; }
+.badge-orange { background: var(--orange-bg); color: var(--orange);  border-color: #fed7aa; }
+.badge-purple { background: var(--purple-bg); color: var(--purple);  border-color: #ddd6fe; }
+.badge-gray   { background: var(--bg2);       color: var(--text3);   border-color: var(--border); }
+
+/* ════════════════════════════════════════════
+   FORM ELEMENTS
+   ════════════════════════════════════════════ */
+.form-grid   { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.form-group  { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1/-1; }
+.form-label {
+  font-size: 12px; font-weight: 600;
+  color: var(--text2); letter-spacing: 0.2px;
+}
+.form-label span { color: var(--red); margin-left: 2px; }
+.form-input {
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13.5px; color: var(--text);
+  background: var(--surface);
+  transition: all 0.15s; outline: none;
+  width: 100%;
+}
+.form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(28,63,170,0.07); }
+.form-input::placeholder { color: var(--text4); }
+.form-input option { background: var(--surface); }
+select.form-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b93b0' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px; }
+
+/* ════════════════════════════════════════════
+   TABLE
+   ════════════════════════════════════════════ */
+.table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
+thead th {
+  padding: 11px 16px; text-align: left;
+  font-size: 11px; font-weight: 700; color: var(--text3);
+  letter-spacing: 1px; text-transform: uppercase; white-space: nowrap;
+}
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--surface2); }
+tbody td { padding: 12px 16px; color: var(--text2); }
+.td-name { font-weight: 600; color: var(--text) !important; }
+.td-code { font-family: var(--mono); font-size: 12px; color: var(--primary) !important; }
+tfoot tr { background: var(--bg2); border-top: 2px solid var(--border2); }
+tfoot td { padding: 12px 16px; font-weight: 700; color: var(--text); }
+
+/* ════════════════════════════════════════════
+   MODAL
+   ════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(15,22,41,0.4);
+  backdrop-filter: blur(3px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200; opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 28px 28px 24px;
+  width: 92%; max-width: 580px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: var(--shadow-xl);
+  transform: translateY(16px) scale(0.98);
+  transition: transform 0.2s;
+}
+.modal-overlay.open .modal { transform: translateY(0) scale(1); }
+.modal-wide { max-width: 820px; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.modal-title { font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+.modal-close {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--bg); border: 1px solid var(--border);
+  color: var(--text3); cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s; flex-shrink: 0;
+}
+.modal-close:hover { background: var(--red-bg); color: var(--red); border-color: var(--red-border); }
+.modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+/* ════════════════════════════════════════════
+   TABS
+   ════════════════════════════════════════════ */
+.tabs { display: flex; gap: 2px; background: var(--bg2); padding: 4px; border-radius: var(--radius); margin-bottom: 20px; overflow-x: auto; }
+.tab { padding: 7px 16px; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text3); transition: all 0.15s; white-space: nowrap; }
+.tab:hover:not(.active) { color: var(--text); }
+.tab.active { background: var(--surface); color: var(--primary); box-shadow: var(--shadow-xs); }
+
+/* ════════════════════════════════════════════
+   ATTENDANCE CALENDAR
+   ════════════════════════════════════════════ */
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
+.cal-header { text-align: center; font-size: 10px; font-weight: 700; color: var(--text3); padding: 4px; text-transform: uppercase; }
+.cal-cell {
+  aspect-ratio: 1; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.13s;
+  border: 1.5px solid transparent;
+  position: relative;
+}
+.cal-cell:hover { transform: scale(1.08); }
+.cal-cell.p  { background: var(--green-bg);  color: var(--green);  border-color: var(--green-border); }
+.cal-cell.h  { background: var(--amber-bg);  color: var(--amber);  border-color: var(--amber-border); }
+.cal-cell.a  { background: var(--red-bg);    color: var(--red);    border-color: var(--red-border); }
+.cal-cell.ho { background: var(--purple-bg); color: var(--purple); border-color: #ddd6fe; }
+.cal-cell.na { background: var(--bg); color: var(--text3); cursor: default; border-color: var(--border); }
+.cal-cell.future { background: var(--bg2); color: var(--text4); cursor: default; }
+.cal-cell.empty  { background: transparent; cursor: default; pointer-events: none; }
+.cal-cell.today  { box-shadow: 0 0 0 2px var(--primary); }
+
+/* ════════════════════════════════════════════
+   PAYSLIP DOCUMENT (for print)
+   ════════════════════════════════════════════ */
+.payslip-wrap { max-width: 700px; margin: 0 auto; }
+.payslip {
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+.ps-head {
+  background: linear-gradient(135deg, #0f1e6b 0%, #1c3faa 100%);
+  padding: 28px 32px; display: flex; justify-content: space-between; align-items: center;
+}
+.ps-co-name { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+.ps-co-sub  { font-size: 11px; color: rgba(255,255,255,0.55); letter-spacing: 2px; text-transform: uppercase; margin-top: 3px; }
+.ps-period-label { font-size: 10px; color: rgba(255,255,255,0.5); letter-spacing: 1.5px; text-transform: uppercase; text-align: right; }
+.ps-period-val { font-size: 20px; font-weight: 800; color: #93c5fd; margin-top: 4px; text-align: right; }
+.ps-stripe { height: 3px; background: linear-gradient(90deg, #1c3faa, #38bdf8, #0d9e6a); }
+.ps-emp-grid { display: grid; grid-template-columns: repeat(3,1fr); background: #f9fafb; border-bottom: 1px solid #e5e7eb; }
+.ps-ef { padding: 12px 16px; border-right: 1px solid #e5e7eb; }
+.ps-ef:last-child { border-right: none; }
+.ps-ef-l { font-size: 9.5px; font-weight: 700; color: #9ca3af; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 3px; }
+.ps-ef-v { font-size: 13px; font-weight: 600; color: #111827; }
+.ps-days { display: grid; grid-template-columns: repeat(2,1fr); border-bottom: 1px solid #e5e7eb; }
+.ps-day { padding: 14px; text-align: center; border-right: 1px solid #e5e7eb; }
+.ps-day:last-child { border-right: none; }
+.ps-day-n { font-size: 26px; font-weight: 800; color: #111827; line-height: 1; }
+.ps-day-l { font-size: 10px; color: #9ca3af; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+.ps-cols { display: grid; grid-template-columns: 1fr 1fr; padding: 20px 24px; gap: 24px; }
+.ps-col-head { font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #111827; display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 2px solid #111827; margin-bottom: 6px; }
+.ps-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #f3f4f6; font-size: 13px; color: #374151; }
+.ps-row:last-of-type { border-bottom: none; }
+.ps-row-v { font-family: var(--mono); font-size: 13px; font-weight: 500; }
+.ps-total { display: flex; justify-content: space-between; align-items: center; background: #0f1e6b; color: #fff; padding: 10px 14px; border-radius: 7px; margin-top: 10px; font-weight: 700; font-size: 13px; }
+.ps-total-v { font-family: var(--mono); color: #93c5fd; }
+.ps-net { margin: 4px 24px 24px; background: linear-gradient(135deg,#0f1e6b,#1c4f8a); border-radius: 10px; padding: 20px 26px; display: flex; justify-content: space-between; align-items: center; }
+.ps-net-label { font-size: 16px; font-weight: 700; color: #fff; }
+.ps-net-words { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 4px; }
+.ps-net-amt { font-size: 34px; font-weight: 800; color: #93c5fd; letter-spacing: -1px; font-family: var(--font); }
+.ps-footer { padding: 14px 24px; background: #f9fafb; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; font-size: 11px; color: #9ca3af; }
+
+/* ════════════════════════════════════════════
+   APPROVAL FLOW
+   ════════════════════════════════════════════ */
+.flow { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.flow-step { display: flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid transparent; }
+.flow-step.done    { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
+.flow-step.active  { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
+.flow-step.waiting { background: var(--bg2); color: var(--text3); border-color: var(--border); }
+.flow-arrow { color: var(--text4); font-size: 14px; }
+
+/* ════════════════════════════════════════════
+   INFO ROWS (profile)
+   ════════════════════════════════════════════ */
+.info-list { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.info-row { display: flex; padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--surface); transition: background 0.1s; }
+.info-row:last-child { border-bottom: none; }
+.info-row:hover { background: var(--surface2); }
+.info-label { font-size: 12px; color: var(--text3); width: 145px; flex-shrink: 0; padding-top: 1px; font-weight: 500; }
+.info-val { font-size: 13.5px; color: var(--text); font-weight: 500; }
+
+/* ════════════════════════════════════════════
+   MISC
+   ════════════════════════════════════════════ */
+.divider { height: 1px; background: var(--border); margin: 18px 0; }
+.section-title { font-size: 16px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; margin-bottom: 4px; }
+.section-sub   { font-size: 13px; color: var(--text3); }
+.page-head { padding: 24px 32px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.page-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.empty-state { text-align: center; padding: 56px 24px; }
+.empty-icon { font-size: 44px; margin-bottom: 14px; opacity: 0.35; }
+.empty-title { font-size: 17px; font-weight: 700; color: var(--text2); margin-bottom: 6px; }
+.empty-desc  { font-size: 13.5px; color: var(--text3); max-width: 300px; margin: 0 auto; line-height: 1.6; }
+.prog { background: var(--bg2); border-radius: 4px; height: 5px; overflow: hidden; }
+.prog-bar { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.mt-16 { margin-top: 16px; }
+.mt-20 { margin-top: 20px; }
+.mt-24 { margin-top: 24px; }
+.flex { display: flex; align-items: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.text-mono { font-family: var(--mono); font-size: 12.5px; color: var(--primary); }
+.text-muted { color: var(--text3); font-size: 13px; }
+.fw-700 { font-weight: 700; }
+.advance-pill { background: var(--orange-bg); color: var(--orange); border: 1px solid #fed7aa; padding: 3px 9px; border-radius: 20px; font-size: 11.5px; font-weight: 700; }
+.pending-pulse { display: inline-block; width: 7px; height: 7px; background: var(--amber); border-radius: 50%; animation: blink 1.4s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+.doc-slot {
+  border: 1.5px dashed var(--border2); border-radius: var(--radius);
+  padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: all 0.15s;
+}
+.doc-slot:hover { border-color: var(--primary); background: var(--primary-bg); }
+.doc-slot.filled { border-style: solid; border-color: var(--green-border); background: var(--green-bg); }
+
+/* Photo upload circle */
+.photo-upload-wrap { position:relative; display:inline-block; cursor:pointer; }
+.photo-upload-wrap:hover .photo-overlay { opacity:1; }
+.photo-overlay {
+  position:absolute; inset:0; border-radius:50%;
+  background:rgba(28,63,170,0.55); display:flex; align-items:center; justify-content:center;
+  opacity:0; transition:opacity 0.18s; color:#fff; font-size:11px; font-weight:700;
+  text-align:center; gap:4px; flex-direction:column;
+}
+/* Doc viewer overlay */
+.doc-viewer-modal {
+  position:fixed; inset:0; background:rgba(15,22,41,0.85); z-index:500;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity 0.2s;
+}
+.doc-viewer-modal.open { opacity:1; pointer-events:all; }
+.doc-viewer-inner {
+  background:var(--surface); border-radius:var(--radius-xl);
+  max-width:90vw; max-height:90vh; overflow:auto;
+  padding:24px; position:relative; box-shadow:var(--shadow-xl);
+}
+.doc-viewer-close {
+  position:absolute; top:14px; right:14px; width:32px; height:32px;
+  border-radius:50%; border:1px solid var(--border); background:var(--bg);
+  cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;
+  transition:all 0.15s; z-index:1;
+}
+.doc-viewer-close:hover { background:var(--red-bg); color:var(--red); border-color:var(--red-border); }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.page-anim { animation: fadeUp 0.22s ease; }
+
+/* NOTIFICATION */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 1000;
+  background: var(--text); color: #fff;
+  padding: 13px 18px; min-width: 260px; max-width: 380px;
+  border-radius: var(--radius); box-shadow: var(--shadow-lg);
+  font-size: 13.5px; font-weight: 500;
+  display: flex; align-items: center; gap: 10px;
+  transform: translateY(80px); opacity: 0;
+  transition: all 0.28s cubic-bezier(0.34,1.56,0.64,1);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: var(--green); }
+.toast.error   { background: var(--red); }
+.toast.info    { background: var(--primary); }
+
+/* SEARCH INPUT */
+.search-input {
+  padding: 9px 12px 9px 36px;
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 13.5px; color: var(--text); background: var(--surface);
+  outline: none; transition: all 0.15s; width: 240px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238b93b0' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='M21 21l-4.35-4.35'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: 11px center;
+}
+.search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(28,63,170,0.07); width: 280px; }
+
+/* ════════════════════════════════════════════
+   MOBILE RESPONSIVE — Full breakpoints
+   ════════════════════════════════════════════ */
+
+/* Hamburger button — hidden on desktop */
+.mob-menu-btn {
+  display: none;
+  align-items: center; justify-content: center;
+  width: 38px; height: 38px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); cursor: pointer;
+  flex-shrink: 0; font-size: 18px;
+}
+
+/* Sidebar overlay backdrop — mobile only */
+.sb-overlay {
+  display: none;
+  position: fixed; inset: 0; background: rgba(15,22,41,0.5);
+  z-index: 49; backdrop-filter: blur(2px);
+}
+.sb-overlay.open { display: block; }
+
+/* Bottom nav bar — mobile only */
+.mob-nav {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 60px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  z-index: 45;
+  box-shadow: 0 -2px 12px rgba(15,22,41,0.08);
+}
+.mob-nav-inner {
+  display: flex; height: 100%;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.mob-nav-inner::-webkit-scrollbar { display: none; }
+.mob-nav-item {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  flex: 0 0 auto; min-width: 64px; padding: 0 8px;
+  cursor: pointer; color: var(--text3); font-size: 10px; font-weight: 600;
+  text-align: center; gap: 3px; transition: color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.mob-nav-item .mn-icon { font-size: 20px; line-height: 1; }
+.mob-nav-item.active { color: var(--primary); }
+.mob-nav-item.active .mn-icon-wrap {
+  background: var(--primary-bg); border-radius: 12px;
+  padding: 4px 12px; margin-bottom: 1px;
+}
+
+/* ── 768px and below ── */
+@media (max-width: 768px) {
+
+  /* Login */
+  #loginScreen { flex-direction: column; }
+  .login-left { display: none; }
+  .login-right { width: 100%; min-height: 100vh; padding: 32px 20px; display: flex; align-items: center; justify-content: center; }
+  .login-form-wrap { max-width: 100%; width: 100%; }
+  .login-form-title { font-size: 22px; }
+
+  /* Sidebar drawer */
+  .sidebar { transform: translateX(-100%); transition: transform 0.25s ease; z-index: 50; width: 280px; box-shadow: var(--shadow-xl); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0 !important; }
+
+  /* Topbar */
+  .topbar { padding: 0 12px; gap: 8px; height: 52px; }
+  .topbar-date { display: none; }
+  .topbar-crumb { display: none; }
+  .topbar-crumb-sep { display: none; }
+  .topbar-page { font-size: 13px; }
+  .topbar-role-badge { display: none; }
+  .mob-menu-btn { display: flex; }
+  #sync-btn { padding: 6px 10px; font-size: 12px; }
+
+  /* Page structure */
+  .page-body { padding: 14px 12px 80px !important; }
+  .page-head { padding: 14px 12px 0 !important; flex-direction: column !important; align-items: stretch !important; gap: 8px !important; margin-bottom: 14px !important; }
+  .page-actions { flex-wrap: wrap !important; gap: 6px !important; width: 100% !important; }
+  .section-title { font-size: 17px; }
+
+  /* Stats — 2 col */
+  .stats-row { grid-template-columns: repeat(2,1fr) !important; gap: 10px !important; margin-bottom: 14px !important; }
+  .stat-val { font-size: 20px; }
+  .stat-card { padding: 12px 12px; }
+  .stat-card-icon { width: 30px; height: 30px; font-size: 14px; margin-bottom: 8px; }
+  .stat-label { font-size: 11px; }
+
+  /* Grids → 1 col */
+  .grid-2, .grid-3 { grid-template-columns: 1fr !important; gap: 10px !important; }
+  .form-grid, .form-grid-3 { grid-template-columns: 1fr !important; }
+
+  /* Cards */
+  .card-pad { padding: 14px !important; }
+  .card { border-radius: 10px !important; }
+
+  /* Tables — always scroll */
+  .table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+  table { font-size: 12px !important; min-width: 520px; }
+  thead th { padding: 8px 8px !important; font-size: 10px !important; white-space: nowrap; }
+  tbody td { padding: 8px 8px !important; font-size: 12px !important; }
+  tfoot td { padding: 8px 8px !important; }
+
+  /* Modals — bottom sheet */
+  .modal { width: 100% !important; max-width: 100% !important; margin: 0 !important; border-radius: 20px 20px 0 0 !important; position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; max-height: 88vh !important; overflow-y: auto !important; transform: translateY(100%) !important; top: auto !important; }
+  .modal-overlay { align-items: flex-end !important; }
+  .modal-overlay.open .modal { transform: translateY(0) !important; }
+
+  /* Bottom nav */
+  .mob-nav { display: flex; }
+
+  /* Misc */
+  .tabs { flex-wrap: nowrap !important; overflow-x: auto !important; }
+  .tab { white-space: nowrap; flex-shrink: 0; }
+  .search-input { width: 100% !important; }
+  .toast { left: 12px !important; right: 12px !important; min-width: 0 !important; bottom: 68px !important; }
+  .info-row { flex-direction: column; gap: 2px; }
+  .info-label { width: 100% !important; font-size: 11px; }
+  .flow { flex-direction: column !important; align-items: flex-start !important; }
+
+  /* ── JS-rendered inline layouts — use body.mobile class ── */
+}
+
+/* Applied by JS when window width ≤ 768 */
+body.mobile .mob-menu-btn { display: flex; }
+body.mobile .mob-nav { display: flex; }
+body.mobile .sidebar { transform: translateX(-100%); transition: transform 0.25s ease; z-index: 50; }
+body.mobile .sidebar.open { transform: translateX(0); }
+body.mobile .main { margin-left: 0 !important; }
+
+/* Fix inline-style grids/flexes on mobile via JS-added class */
+body.mobile [data-mob-stack] {
+  flex-direction: column !important;
+  flex-wrap: wrap !important;
+}
+body.mobile [data-mob-grid] {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  width: 100% !important;
+}
+body.mobile [data-mob-grid2] {
+  display: grid !important;
+  grid-template-columns: repeat(2,1fr) !important;
+}
+body.mobile [data-mob-scroll] {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+body.mobile [data-mob-full] {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+body.mobile [data-mob-hide] { display: none !important; }
+
+@media (max-width: 480px) {
+  html { font-size: 14px; }
+  .stats-row { grid-template-columns: repeat(2,1fr) !important; gap: 8px !important; }
+  .stat-val { font-size: 18px; }
+  .btn { font-size: 12px !important; padding: 8px 11px !important; }
+  .btn-sm { font-size: 11px !important; padding: 6px 9px !important; }
+  .btn-xs { font-size: 10.5px !important; padding: 4px 7px !important; }
+  .page-body { padding: 10px 10px 76px !important; }
+  .page-head { padding: 10px 10px 0 !important; }
+  .card-pad { padding: 11px !important; }
+  .section-title { font-size: 15px; }
+  .topbar { height: 50px; }
+  .mob-nav { height: 56px; }
+  .toast { bottom: 62px !important; }
+  table { min-width: 460px; }
+}
+
+@media print {
+  .sidebar,.main .topbar,.page-head,.btn,.tabs,.toast,#app>*:not(#print-area){display:none!important;}
+  .payslip { box-shadow: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN SCREEN ══ -->
+<div id="loginScreen" style="display:flex;min-height:100vh;">
+  <div class="login-left">
+    <div class="login-left-content">
+      <div class="login-brand">
+        <div class="login-brand-icon">🛰️</div>
+        <div>
+          <div class="login-brand-name">BharatGPS Tracker</div>
+          <div class="login-brand-sub">Employee Portal</div>
+        </div>
+      </div>
+      <div class="login-headline">Your work,<br><span>all in one place.</span></div>
+      <div class="login-desc">View attendance, download payslips, check commissions and manage requests — all from your personal portal.</div>
+      <div class="login-features">
+        <div class="login-feat"><div class="login-feat-dot"></div>Attendance &amp; payslip history</div>
+        <div class="login-feat"><div class="login-feat-dot"></div>Commission breakdown</div>
+        <div class="login-feat"><div class="login-feat-dot"></div>Leave &amp; advance requests</div>
+        <div class="login-feat"><div class="login-feat-dot"></div>Expense claims &amp; bank details</div>
+      </div>
+    </div>
+  </div>
+  <div class="login-right">
+    <div class="login-form-wrap">
+      <div class="login-form-title">Sign in</div>
+      <div class="login-form-sub">Enter your Employee ID and password</div>
+      <div class="lf-group">
+        <label class="lf-label">Employee ID</label>
+        <input class="lf-input" id="loginUser" placeholder="Employee ID" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
+      </div>
+      <div class="lf-group">
+        <label class="lf-label">Password</label>
+        <input class="lf-input" type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="btn-login" onclick="doLogin()">Sign In →</button>
+
+      <div style="text-align:center;margin-top:18px;font-size:13px;color:var(--text3);">
+        <a href="index.html" style="color:var(--primary);font-weight:600;">← Admin / Manager Login</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP SHELL ══ -->
+<div id="app" style="display:none;">
+  <div class="app-wrap">
+
+    <!-- SIDEBAR OVERLAY -->
+    <div class="sb-overlay" id="sbOverlay" onclick="closeMobileMenu()"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-brand">
+        <div class="sb-brand-icon">🛰️</div>
+        <div>
+          <div class="sb-brand-name">BharatGPS</div>
+          <div class="sb-brand-sub">Employee Portal</div>
+        </div>
+      </div>
+      <div id="sidebarNav"></div>
+      <div id="sidebarFooter"></div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main" id="mainWrap">
+      <div class="topbar">
+        <div class="topbar-left">
+          <button class="mob-menu-btn" onclick="toggleMobileMenu()">☰</button>
+          <span class="topbar-crumb">BharatGPS</span>
+          <span class="topbar-crumb-sep">›</span>
+          <span class="topbar-page" id="topbarPage">Home</span>
+        </div>
+        <div class="topbar-right">
+          <span class="topbar-date" id="topbarClock"></span>
+          <span class="topbar-role-badge" id="topbarUser" style="background:var(--green-bg);color:var(--green);">Employee</span>
+        </div>
+      </div>
+      <div id="mainArea"></div>
+    </main>
+
+  </div>
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="mob-nav" id="mobNav"></nav>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOuter(event)">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+
+// ══════════════════════════════════════════
+// FIREBASE + DB LAYER
+// ══════════════════════════════════════════
+const FIREBASE_CONFIG={apiKey:"AIzaSyDU3djEfi5Ro1ZpvIWsfXZdXLHZSYH-frY",authDomain:"har-management.firebaseapp.com",databaseURL:"https://har-management-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"har-management",storageBucket:"har-management.firebasestorage.app",messagingSenderId:"997198905192",appId:"1:997198905192:web:f268e78464f123f2e960dd"};
+const FB_PATH='bghr';
+let _fbDatabase=null,_fbRef=null,_fbReady=false;
+const _cache={};
+function _loadFirebase(){return new Promise(resolve=>{if(_fbReady){resolve();return;}const s1=document.createElement('script');s1.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js';s1.onload=()=>{const s2=document.createElement('script');s2.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js';s2.onload=()=>{try{if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);_fbDatabase=firebase.database();_fbRef=_fbDatabase.ref(FB_PATH);_fbReady=true;console.log('[HR] Firebase ready');}catch(e){console.error('[HR]',e.message);}resolve();};document.head.appendChild(s2);};document.head.appendChild(s1);});}
+const DB={
+  setSync(k,v){_cache[k]=v;try{localStorage.setItem('bghr_'+k,JSON.stringify(v));}catch(e){}if(_fbReady)_fbRef.child(k).set(v).catch(e=>console.warn('[HR] write',k,e.message));},
+  getSync(k){if(_cache[k]!==undefined)return _cache[k];try{const r=localStorage.getItem('bghr_'+k);if(r!=null){_cache[k]=JSON.parse(r);return _cache[k];}}catch(e){}return null;},
+  async loadAll(){if(!_fbReady)return false;try{const snap=await _fbRef.once('value');const data=snap.val()||{};const keys=['employees','attendance','attComments','salaryAdvances','approvals','commissions','deductions','fieldWork','amendHistory','backDateRequests','leaveRequests','docApprovals','userPasswords','adminActionLog','empPasswords','empClaims','payslipStatus'];let changed=false;keys.forEach(k=>{const v=data[k];const empty=v===null||v===undefined||(Array.isArray(v)&&v.length===0);if(empty){if(_cache[k]!==undefined){delete _cache[k];try{localStorage.removeItem('bghr_'+k);}catch(e){}changed=true;}}else{if(JSON.stringify(_cache[k])!==JSON.stringify(v)){_cache[k]=v;try{localStorage.setItem('bghr_'+k,JSON.stringify(v));}catch(e){}changed=true;}}});return changed;}catch(e){console.warn('[HR] loadAll',e.message);return false;}},
+  async pushAll(){if(!_fbReady){showToast('Firebase not connected','error');return;}const keys=['employees','attendance','attComments','salaryAdvances','approvals','commissions','deductions','fieldWork','amendHistory','backDateRequests','leaveRequests','docApprovals','userPasswords','adminActionLog','empPasswords','empClaims','payslipStatus'];const data={};keys.forEach(k=>{const v=this.getSync(k);if(v!==null)data[k]=v;});try{await _fbRef.update(data);showToast('✅ All data synced to Firebase','success');}catch(e){showToast('❌ Sync failed: '+e.message,'error');}}
+};
+function _startFirebaseListener(){if(!_fbReady)return;const keys=['employees','attendance','attComments','salaryAdvances','approvals','commissions','deductions','fieldWork','amendHistory','backDateRequests','leaveRequests','docApprovals','userPasswords','adminActionLog','empPasswords','empClaims','payslipStatus'];_fbRef.on('value',snap=>{const data=snap.val()||{};let changed=false;keys.forEach(k=>{const v=data[k];const empty=v===null||v===undefined||(Array.isArray(v)&&v.length===0);if(empty){if(_cache[k]!==undefined){delete _cache[k];try{localStorage.removeItem('bghr_'+k);}catch(e){}changed=true;}}else{if(JSON.stringify(_cache[k])!==JSON.stringify(v)){_cache[k]=v;try{localStorage.setItem('bghr_'+k,JSON.stringify(v));}catch(e){}changed=true;}}});if(changed&&currentUser){renderSidebar();const a=document.activeElement;if(!(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.tagName==='SELECT')))renderPage(currentPage);}},e=>console.warn('[HR] listener',e.message));}
+window.addEventListener('storage',e=>{if(!e.key||!e.key.startsWith('bghr_'))return;const k=e.key.replace('bghr_','');try{if(e.newValue!==null)_cache[k]=JSON.parse(e.newValue);}catch(ex){}if(currentUser){clearTimeout(window._syncT);window._syncT=setTimeout(()=>renderSidebar(),600);}});
+
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║  DEFAULT DATA                                            ║
+// ╚══════════════════════════════════════════════════════════╝
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let currentUser = null;
+let currentPage = 'emp_home';
+
+// ══════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim().toLowerCase();
+  const p = document.getElementById('loginPass').value;
+  if(!u || !p){ showToast('Enter your Employee ID and password','error'); return; }
+
+  // If employees not in cache yet, load from Firebase then retry
+  if(!DB.getSync('employees') || (DB.getSync('employees')||[]).length === 0) {
+    const btn = document.querySelector('.btn-login');
+    if(btn){ btn.textContent = 'Loading...'; btn.disabled = true; }
+    _loadFirebase().then(()=>DB.loadAll()).then(()=>{
+      if(btn){ btn.textContent = 'Sign In →'; btn.disabled = false; }
+      _doLoginCheck(u, p);
+    });
+    return;
+  }
+  _doLoginCheck(u, p);
+}
+
+function _doLoginCheck(u, p) {
+  const emps = DB.getSync('employees') || [];
+  const emp = emps.find(e => e.id.toLowerCase() === u);
+  if(!emp){ showToast('Employee ID not found','error'); return; }
+  const empPwds = DB.getSync('empPasswords') || {};
+  const storedPass = empPwds[emp.id] !== undefined ? empPwds[emp.id] : (emp.phone || emp.id.toLowerCase());
+  if(p !== storedPass){ showToast('Incorrect password','error'); return; }
+  currentUser = {username:emp.id, role:'employee', empId:emp.id, name:emp.name, color:'#0d9e6a', colorBg:'#dcfdf0'};
+  sessionStorage.setItem('ep_session', JSON.stringify(currentUser));
+  document.getElementById('loginScreen').style.display = 'none';
+  initApp();
+}
+
+function doLogout() {
+  sessionStorage.removeItem('ep_session');
+  currentUser = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+// ══════════════════════════════════════════
+// NAV / SIDEBAR
+// ══════════════════════════════════════════
+const NAV_CONFIG = [
+  {section:'MY PORTAL', items:[
+    {id:'emp_home',      icon:'⌂',  label:'Home'},
+    {id:'emp_attendance',icon:'📅', label:'My Attendance'},
+    {id:'emp_payslips',  icon:'🧾', label:'My Payslips'},
+    {id:'emp_commission',icon:'💰', label:'Commission'},
+  ]},
+  {section:'REQUESTS', items:[
+    {id:'emp_advance',   icon:'💳', label:'Cash Advance'},
+    {id:'emp_leave',     icon:'🏥', label:'Leave Request'},
+    {id:'emp_claims',    icon:'🧾', label:'Expense Claims'},
+  ]},
+  {section:'PROFILE', items:[
+    {id:'emp_profile',   icon:'👤', label:'My Profile'},
+  ]},
+];
+
+const MOB_NAV = [
+  {id:'emp_home',       icon:'⌂',  label:'Home'},
+  {id:'emp_attendance', icon:'📅', label:'Attend.'},
+  {id:'emp_payslips',   icon:'🧾', label:'Payslips'},
+  {id:'emp_leave',      icon:'🏥', label:'Leave'},
+  {id:'emp_profile',    icon:'👤', label:'Profile'},
+];
+
+function renderSidebar() {
+  const nav = document.getElementById('sidebarNav');
+  const footer = document.getElementById('sidebarFooter');
+  if(!nav || !currentUser) return;
+
+  const advP = (DB.getSync('salaryAdvances')||[]).filter(x=>x.empId===currentUser.empId&&x.status==='pending').length;
+  const lvP  = (DB.getSync('leaveRequests')||[]).filter(x=>x.empId===currentUser.empId&&x.status==='pending').length;
+  const clP  = (DB.getSync('empClaims')||[]).filter(x=>x.empId===currentUser.empId&&x.status==='pending').length;
+  const badges = {emp_advance:advP, emp_leave:lvP, emp_claims:clP};
+
+  let html = '<div class="sb-nav">';
+  NAV_CONFIG.forEach(section => {
+    html += `<div class="sb-section-label">${section.section}</div>`;
+    section.items.forEach(item => {
+      const b = badges[item.id]||0;
+      html += `<div class="sb-item${currentPage===item.id?' active':''}" onclick="navigateTo('${item.id}');closeMobileMenu()">
+        <span class="sb-icon">${item.icon}</span>
+        <span>${item.label}</span>
+        ${b?`<span class="sb-badge">${b}</span>`:''}
+      </div>`;
+    });
+  });
+  html += '</div>';
+  nav.innerHTML = html;
+
+  const init = currentUser.name.split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
+  footer.innerHTML = `
+    <div class="sb-user">
+      <div class="sb-avatar" style="background:${currentUser.colorBg};color:${currentUser.color};">${init}</div>
+      <div>
+        <div class="sb-user-name">${currentUser.name}</div>
+        <div class="sb-user-role">Employee</div>
+      </div>
+    </div>
+    <div class="sb-footer">
+      <button class="btn-logout" onclick="doLogout()">🚪 Sign Out</button>
+    </div>`;
+
+  const tb = document.getElementById('topbarUser');
+  if(tb) tb.textContent = currentUser.name;
+  renderMobileNav();
+}
+
+function renderMobileNav() {
+  const el = document.getElementById('mobNav');
+  if(!el || !currentUser) return;
+  el.innerHTML = `<div class="mob-nav-inner">
+    ${MOB_NAV.map(item=>`
+      <div class="mob-nav-item${currentPage===item.id?' active':''}" onclick="navigateTo('${item.id}');closeMobileMenu()">
+        <div class="mn-icon-wrap"><div class="mn-icon">${item.icon}</div></div>
+        <span>${item.label}</span>
+      </div>`).join('')}
+  </div>`;
+}
+
+const PAGE_TITLES = {
+  emp_home:'Home', emp_attendance:'My Attendance', emp_payslips:'My Payslips',
+  emp_commission:'Commission', emp_advance:'Cash Advance', emp_leave:'Leave Requests',
+  emp_claims:'Expense Claims', emp_profile:'My Profile'
+};
+function navigateTo(page) {
+  currentPage = page;
+  const tp = document.getElementById('topbarPage');
+  if(tp) tp.textContent = PAGE_TITLES[page] || 'Portal';
+  renderSidebar();
+  renderPage(page);
+  window.scrollTo(0,0);
+}
+
+function renderPage(page) {
+  currentPage = page;
+  const m = document.getElementById('mainArea');
+  if(!m) return;
+  try {
+    switch(page) {
+      case 'emp_home':       m.innerHTML = renderEmpHome(); break;
+      case 'emp_attendance': m.innerHTML = renderEmpAttendance(); break;
+      case 'emp_payslips':   m.innerHTML = renderEmpPayslips(); break;
+      case 'emp_commission': m.innerHTML = renderEmpCommission(); break;
+      case 'emp_advance':    m.innerHTML = renderEmpAdvance(); break;
+      case 'emp_leave':      m.innerHTML = renderEmpLeave(); break;
+      case 'emp_claims':     m.innerHTML = renderEmpClaims(); break;
+      case 'emp_profile':    m.innerHTML = renderEmpProfile(); break;
+      default: m.innerHTML = renderEmpHome();
+    }
+  } catch(err) {
+    m.innerHTML = `<div class="page-body"><div class="card card-pad" style="border-left:4px solid var(--red);">
+      <div style="font-weight:700;color:var(--red);margin-bottom:8px;">⚠️ Page Error</div>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--text2);white-space:pre-wrap;">${err.message}\n\n${err.stack||''}</div>
+      <button class="btn btn-secondary btn-sm" style="margin-top:12px;" onclick="renderPage('${page}')">↺ Retry</button>
+    </div></div>`;
+    console.error('[renderPage]', page, err);
+  }
+}
+
+function toggleMobileMenu() {
+  const sb = document.querySelector('.sidebar');
+  const ov = document.getElementById('sbOverlay');
+  if(!sb||!ov) return;
+  const isOpen = sb.classList.contains('open');
+  sb.classList.toggle('open',!isOpen);
+  ov.classList.toggle('open',!isOpen);
+  document.body.style.overflow = isOpen?'':'hidden';
+}
+function closeMobileMenu() {
+  const sb = document.querySelector('.sidebar');
+  const ov = document.getElementById('sbOverlay');
+  if(sb) sb.classList.remove('open');
+  if(ov) ov.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ══════════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════════
+function openModal(title, body, wide=false) {
+  const box = document.getElementById('modalBox');
+  box.className = `modal${wide?' modal-wide':''}`;
+  box.innerHTML = `
+    <div class="modal-header">
+      <div class="modal-title">${title}</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    ${body}`;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+function closeModalOuter(e) { if(e.target===document.getElementById('modalOverlay')) closeModal(); }
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║  TOAST                                                   ║
+// ╚══════════════════════════════════════════════════════════╝
+let _toastTimer;
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  const icons = {success:'✓',error:'✕',info:'ℹ'};
+  t.innerHTML = `<span style="font-weight:800;">${icons[type]||'ℹ'}</span> ${msg}`;
+  t.className = `toast ${type} show`;
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║  UTILITIES                                               ║
+// ╚══════════════════════════════════════════════════════════╝
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function curMY() {
+  const d = new Date();
+  const mns = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return {month:mns[d.getMonth()], year:String(d.getFullYear()), mn:d.getMonth()+1};
+}
+function getLast6Months() {
+  const mns = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const res=[];
+  const d = new Date();
+  for(let i=0;i<6;i++){
+    res.unshift({m:mns[d.getMonth()],y:d.getFullYear(),mn:d.getMonth()+1,label:`${mns[d.getMonth()].slice(0,3)} ${d.getFullYear()}`});
+    d.setMonth(d.getMonth()-1);
+  }
+  return res;
+}
+function greet() {
+  const h = new Date().getHours();
+  return h<12?'Morning':h<17?'Afternoon':'Evening';
+}
+function fmtN(n) {
+  if(!n||isNaN(n)) return '0';
+  return Number(n).toLocaleString('en-IN');
+}
+function numWords(n) {
+  if(n===0) return 'Zero';
+  const o=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+  const t=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+  function c(x){
+    if(x<20)return o[x];
+    if(x<100)return t[Math.floor(x/10)]+(x%10?' '+o[x%10]:'');
+    if(x<1000)return o[Math.floor(x/100)]+' Hundred'+(x%100?' '+c(x%100):'');
+    if(x<100000)return c(Math.floor(x/1000))+' Thousand'+(x%1000?' '+c(x%1000):'');
+    if(x<10000000)return c(Math.floor(x/100000))+' Lakh'+(x%100000?' '+c(x%100000):'');
+    return c(Math.floor(x/10000000))+' Crore'+(x%10000000?' '+c(x%10000000):'');
+  }
+  return c(n);
+}
+
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+
+// ══════════════════════════════════════════
+// PAYSLIP
+// ══════════════════════════════════════════
+function buildPayslipHTML(e,m,y,mName,slipStatus) {
+  const att  = DB.getSync('attendance')||{};
+  const comm = DB.getSync('commissions')||{};
+  const ded  = DB.getSync('deductions')||{};
+  const advances = DB.getSync('salaryAdvances')||[];
+  const days = new Date(y,m,0).getDate();
+  let p=0,h=0,a=0,tc=0,td=0;
+  for(let d=1;d<=days;d++){
+    const k=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const s=(att[k]||{})[e.id];
+    if(s==='P')p++;
+    else if(s==='H')h++;
+    // A, L, unmarked — all not counted as present
+    if(comm[k]?.[e.id]) tc+=comm[k][e.id];
+    if(ded[k]?.[e.id])  td+=ded[k][e.id];
+  }
+  // Salary base is always 30 days
+  // paidDays = full presents + complete half-day pairs (2 halves = 1 day)
+  // absentDays = 30 - paidDays (covers unmarked, A, L, odd half-day, 31-day months)
+  const paidDays   = p + Math.floor(h/2);
+  const absentDays = Math.max(0, 30 - paidDays);
+  const perDay      = e.salary / 30;
+  const absentDed   = Math.round(absentDays * perDay);
+  const basicEarned = e.salary - absentDed;
+
+  // ── Field Work Commission breakdown ──────────────────────
+  const fw     = DB.getSync('fieldWork')||{};
+  const fwKey  = `${mName}-${y}`;
+  const fwData = (fw[fwKey]||{})[e.id]||{};
+  const fwMT   = fwData.mt||0;   // Magnet GPS — count only
+  const fwEC   = fwData.ec||0;   // Eng/Cut
+  const fwTC   = fwData.tc||0;   // Tech GPS
+  const fwOST  = fwData.ost||0;  // Outstation trips
+
+  const ecComm    = fwEC * 400;                          // ₹400 per eng/cut
+  const topTotal  = fwTC >= 30 ? fwTC * 100 : 0;        // ≥30 units bonus
+  const topTech   = Math.round(topTotal * 0.70);         // 70% to tech
+  const ostComm   = fwOST * 300;                         // ₹300 fixed per trip
+  const fwTotal   = ecComm + topTech + ostComm;          // total field commission
+
+  // totalComm from fieldWork only — tc (commissions DB) is same data, don't add twice
+  const totalComm = fwTotal;
+  const grossEarnings = basicEarned + totalComm;
+
+  const pf   = e.pfApplicable   ? Math.round((e.basicSalary||e.salary/2)*0.12) : 0;
+  const esic = e.esicApplicable ? Math.round(grossEarnings*0.0075) : 0;
+  const advOnetime = advances.filter(x=>
+    x.empId===e.id && x.status==='approved' &&
+    (!x.deductionType||x.deductionType==='onetime') &&
+    x.month===mName && String(x.year)===String(y)
+  ).reduce((s,x)=>s+x.amount,0);
+  const advMonthly = advances.filter(x=>{
+    if(x.empId!==e.id||x.status!=='approved'||x.deductionType!=='monthly') return false;
+    const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const startIdx = months.indexOf(x.emiStartMonth||x.month)*1 + (parseInt(x.emiStartYear||x.year)-2020)*12;
+    const curIdx   = months.indexOf(mName)*1 + (parseInt(y)-2020)*12;
+    const monthsElapsed = curIdx - startIdx;
+    return monthsElapsed>=0 && monthsElapsed<(x.emiMonths||1);
+  }).reduce((s,x)=>s+(x.emiAmount||0),0);
+  const adv = advOnetime + advMonthly;
+  const grossDed  = absentDed + pf + esic + td + adv;
+  const netSalary = e.salary + fwTotal - absentDed - pf - esic - td - adv;
+
+  // ── Earnings rows ────────────────────────────────────────
+  const earRows = [
+    {l:'Monthly Salary', v:e.salary},
+    ...(ecComm   ? [{l:`Engine Cut Installation (${fwEC} units)`,  v:ecComm}]  : []),
+    ...(topTech  ? [{l:`Tech GPS Bonus (${fwTC} units)`,           v:topTech}] : []),
+    ...(ostComm  ? [{l:`Outstation Allowance (${fwOST} trips)`,    v:ostComm}] : []),
+  ].filter(r=>r.v!==0);
+
+  // ── Deduction rows ───────────────────────────────────────
+  const dedRows = [
+    ...(absentDed  ? [{l:`Absent Deduction (${absentDays} day${absentDays!==1?'s':''} × ₹${fmtN(Math.round(perDay))})`, v:absentDed}] : []),
+    ...(pf         ? [{l:'Provident Fund (12%)',        v:pf}]        : []),
+    ...(esic       ? [{l:'ESIC (0.75%)',                v:esic}]      : []),
+    ...(td         ? [{l:'Deduction',                   v:td}]        : []),
+    ...(advOnetime ? [{l:'Salary Advance (One-Time)',   v:advOnetime}]: []),
+    ...(advMonthly ? [{l:'Salary Advance (EMI)',        v:advMonthly}]: []),
+  ];
+
+  return `
+  <div class="payslip-wrap">
+    <div class="payslip" id="slip-${e.id}">
+      ${(slipStatus&&slipStatus.status==='paid')?`<div style="background:#0d9e6a;color:#fff;text-align:center;padding:7px 0;font-size:12px;font-weight:700;letter-spacing:1px;">✅ SALARY PAID — ${slipStatus.paidAt||''}${slipStatus.utr?' | REF: '+slipStatus.utr:''}</div>`:
+        (slipStatus&&slipStatus.status==='locked')?`<div style="background:#1c3faa;color:#fff;text-align:center;padding:7px 0;font-size:12px;font-weight:700;letter-spacing:1px;">🔒 PAYSLIP FINALISED — ${slipStatus.lockedAt||''}</div>`:''}
+      <div class="ps-head">
+        <div>
+          <div class="ps-co-name">Bharat GPS Tracker</div>
+          <div class="ps-co-sub">GPS Tracking Solutions · India</div>
+        </div>
+        <div>
+          <div class="ps-period-label">Salary Slip</div>
+          <div class="ps-period-val">${mName} ${y}</div>
+        </div>
+      </div>
+      <div class="ps-stripe"></div>
+      <div class="ps-emp-grid">
+        <div class="ps-ef"><div class="ps-ef-l">Employee Code</div><div class="ps-ef-v" style="font-family:var(--mono);color:#1c3faa;">${e.id}</div></div>
+        <div class="ps-ef"><div class="ps-ef-l">Employee Name</div><div class="ps-ef-v">${e.salutation||''} ${e.name}</div></div>
+        <div class="ps-ef"><div class="ps-ef-l">Date of Joining</div><div class="ps-ef-v">${e.joinDate}</div></div>
+        <div class="ps-ef"><div class="ps-ef-l">Designation</div><div class="ps-ef-v">${e.designation}</div></div>
+        <div class="ps-ef"><div class="ps-ef-l">Work Location</div><div class="ps-ef-v">${e.location}</div></div>
+        <div class="ps-ef"><div class="ps-ef-l">PF Number</div><div class="ps-ef-v" style="font-family:var(--mono);">${e.pfNumber||'N/A'}</div></div>
+      </div>
+      <div class="ps-days">
+        <div class="ps-day"><div class="ps-day-n" style="color:#0d9e6a;">${paidDays}</div><div class="ps-day-l">Present Days</div></div>
+        <div class="ps-day"><div class="ps-day-n" style="color:#d63b3b;">${absentDays}</div><div class="ps-day-l">Absent Days</div></div>
+      </div>
+      ${(fwEC>0||fwTC>0||fwOST>0||fwMT>0)?`
+      <div style="margin:0 0 0 0;padding:10px 18px;background:#f0fdf4;border-top:1px solid #bbf7d0;border-bottom:1px solid #bbf7d0;">
+        <div style="font-size:10px;font-weight:700;color:#15803d;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Field Work Summary</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;">
+          ${fwMT>0?`<div style="background:#fff;border:1px solid #bbf7d0;border-radius:6px;padding:7px 10px;text-align:center;">
+            <div style="font-size:16px;font-weight:800;color:#1c3faa;">${fwMT}</div>
+            <div style="font-size:10px;color:#64748b;margin-top:2px;">🧲 Magnet GPS</div>
+            <div style="font-size:10px;color:#94a3b8;font-style:italic;">Count only</div>
+          </div>`:''}
+          ${fwEC>0?`<div style="background:#fff;border:1px solid #bbf7d0;border-radius:6px;padding:7px 10px;text-align:center;">
+            <div style="font-size:16px;font-weight:800;color:#1c3faa;">${fwEC}</div>
+            <div style="font-size:10px;color:#64748b;margin-top:2px;">⚙️ Engine Cut</div>
+            <div style="font-size:10px;color:#15803d;font-weight:700;">₹${fmtN(ecComm)}</div>
+          </div>`:''}
+          ${fwTC>0?`<div style="background:#fff;border:1px solid #bbf7d0;border-radius:6px;padding:7px 10px;text-align:center;">
+            <div style="font-size:16px;font-weight:800;color:#1c3faa;">${fwTC}</div>
+            <div style="font-size:10px;color:#64748b;margin-top:2px;">💻 Tech GPS</div>
+            <div style="font-size:10px;color:${topTech>0?'#15803d':'#94a3b8'};font-weight:700;">${topTech>0?`₹${fmtN(topTech)}`:'< 30 units'}</div>
+          </div>`:''}
+          ${fwOST>0?`<div style="background:#fff;border:1px solid #bbf7d0;border-radius:6px;padding:7px 10px;text-align:center;">
+            <div style="font-size:16px;font-weight:800;color:#1c3faa;">${fwOST}</div>
+            <div style="font-size:10px;color:#64748b;margin-top:2px;">🚗 Outstation</div>
+            <div style="font-size:10px;color:#15803d;font-weight:700;">₹${fmtN(ostComm)}</div>
+          </div>`:''}
+        </div>
+      </div>`:''}
+
+      <div class="ps-cols">
+        <div>
+          <div class="ps-col-head"><span>Earnings</span><span>Amount (₹)</span></div>
+          ${earRows.map(r=>`<div class="ps-row"><span>${r.l}</span><span class="ps-row-v">₹ ${fmtN(r.v)}</span></div>`).join('')}
+          <div class="ps-total"><span>Gross Earnings</span><span class="ps-total-v">₹ ${fmtN(grossEarnings)}</span></div>
+        </div>
+        <div>
+          <div class="ps-col-head"><span>Deductions</span><span>Amount (₹)</span></div>
+          ${dedRows.length?dedRows.map(r=>`<div class="ps-row"><span>${r.l}</span><span class="ps-row-v" style="color:#d63b3b;">₹ ${fmtN(r.v)}</span></div>`).join(''):'<div class="ps-row" style="color:#9ca3af;font-style:italic;font-size:12.5px;">No deductions this month</div>'}
+          <div class="ps-total"><span>Gross Deductions</span><span class="ps-total-v">₹ ${fmtN(grossDed)}</span></div>
+        </div>
+      </div>
+      <div class="ps-net">
+        <div>
+          <div class="ps-net-label">Net Salary Payable</div>
+          <div class="ps-net-words">${numWords(Math.round(netSalary))} Rupees Only</div>
+        </div>
+        <div class="ps-net-amt">₹${fmtN(netSalary)}</div>
+      </div>
+      <div class="ps-footer">
+        <div>Computer generated salary slip. No signature required.</div>
+        <div>Generated: ${new Date().toLocaleDateString('en-IN')}</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button class="btn btn-secondary btn-sm" onclick="printSlip('${e.id}','${mName}','${y}')">🖨️ Print / Save PDF</button>
+    </div>
+  </div>`;
+}
+function printSlip(empId, month, year) {
+  const slip = document.getElementById('slip-'+empId);
+  if(!slip) return;
+  const w = window.open('','_blank','width=820,height=720');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>Payslip — ${month} ${year}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+      *{margin:0;padding:0;box-sizing:border-box;}
+      body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;padding:20px;}
+      --mono:font-family:'IBM Plex Mono',monospace;
+      .payslip{border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;max-width:680px;margin:0 auto;}
+      .ps-head{background:linear-gradient(135deg,#0f1e6b,#1c3faa);padding:24px 28px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+      .ps-co-name{font-size:20px;font-weight:800;color:#fff;}
+      .ps-co-sub{font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:2px;text-transform:uppercase;margin-top:3px;}
+      .ps-period-label{font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:1.5px;text-transform:uppercase;text-align:right;}
+      .ps-period-val{font-size:17px;font-weight:800;color:#93c5fd;text-align:right;margin-top:3px;}
+      .ps-stripe{height:3px;background:linear-gradient(90deg,#1c3faa,#38bdf8,#0d9e6a);-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+      .ps-emp-grid{display:grid;grid-template-columns:repeat(3,1fr);background:#f9fafb;border-bottom:1px solid #e5e7eb;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+      .ps-ef{padding:10px 14px;border-right:1px solid #e5e7eb;}
+      .ps-ef:last-child{border-right:none;}
+      .ps-ef-l{font-size:9px;font-weight:700;color:#9ca3af;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px;}
+      .ps-ef-v{font-size:12.5px;font-weight:600;color:#111827;}
+      .ps-days{display:grid;grid-template-columns:repeat(2,1fr);border-bottom:1px solid #e5e7eb;}
+      .ps-day{padding:12px;text-align:center;border-right:1px solid #e5e7eb;}
+      .ps-day:last-child{border-right:none;}
+      .ps-day-n{font-size:22px;font-weight:800;color:#111;}
+      .ps-day-l{font-size:9.5px;color:#9ca3af;margin-top:3px;text-transform:uppercase;letter-spacing:1px;}
+      .ps-cols{display:grid;grid-template-columns:1fr 1fr;padding:18px 22px;gap:20px;}
+      .ps-col-head{font-size:9.5px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#111;display:flex;justify-content:space-between;padding-bottom:6px;border-bottom:2px solid #111;margin-bottom:4px;}
+      .ps-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f3f4f6;font-size:12.5px;color:#374151;}
+      .ps-row-v{font-family:'IBM Plex Mono',monospace;font-size:12px;}
+      .ps-total{display:flex;justify-content:space-between;background:#0f1e6b;color:#fff;padding:9px 12px;border-radius:6px;margin-top:8px;font-weight:700;font-size:12.5px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+      .ps-total-v{font-family:'IBM Plex Mono',monospace;color:#93c5fd;}
+      .ps-net{margin:4px 22px 20px;background:linear-gradient(135deg,#0f1e6b,#1c4f8a);border-radius:8px;padding:18px 22px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+      .ps-net-label{font-size:14px;font-weight:700;color:#fff;}
+      .ps-net-words{font-size:10px;color:rgba(255,255,255,0.5);margin-top:3px;}
+      .ps-net-amt{font-size:30px;font-weight:800;color:#93c5fd;letter-spacing:-0.5px;}
+      .ps-footer{padding:12px 22px;background:#f9fafb;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;font-size:10.5px;color:#9ca3af;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+      @media print{body{padding:0;}.payslip{border:none;border-radius:0;}}
+    </style></head><body>${slip.outerHTML}</body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(), 800);
+}
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║  REPORTS                                                 ║
+// ╚══════════════════════════════════════════════════════════╝
+
+// ══════════════════════════════════════════
+// EMPLOYEE PORTAL FUNCTIONS
+// ══════════════════════════════════════════
+function _empData(){const emps=DB.getSync('employees')||[];return emps.find(e=>e.id===currentUser.empId)||null;}
+function _eColor(s){return s==='P'?'var(--green)':s==='H'?'var(--amber)':s==='A'?'var(--red)':s==='L'?'var(--primary)':'var(--text3)';}
+function _eBg(s){return s==='P'?'var(--green-bg)':s==='H'?'var(--amber-bg)':s==='A'?'var(--red-bg)':s==='L'?'var(--primary-bg)':'var(--bg2)';}
+function _eLabel(s){return s==='P'?'Present':s==='H'?'Half Day':s==='A'?'Absent':s==='L'?'On Leave':'Not Marked';}
+
+function renderEmpHome(){
+  const e=_empData();
+  if(!e)return'<div class="page-body"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Employee record not found</div></div></div>';
+  const att=DB.getSync('attendance')||{};
+  const today=todayStr();
+  const {month,year,mn}=curMY();
+  const days=new Date(parseInt(year),mn,0).getDate();
+  const mPad=String(mn).padStart(2,'0');
+  let p=0,h=0,a=0,l=0;
+  for(let d=1;d<=days;d++){const k=`${year}-${mPad}-${String(d).padStart(2,'0')}`;const s=(att[k]||{})[e.id]||'';if(s==='P')p++;else if(s==='H')h++;else if(s==='A')a++;else if(s==='L')l++;}
+  const payDays=Math.floor(p+h*0.5);
+  const earned=Math.round((e.salary/30)*payDays);
+  const todaySt=(att[today]||{})[e.id]||'';
+  const advP=(DB.getSync('salaryAdvances')||[]).filter(x=>x.empId===e.id&&x.status==='pending').length;
+  const lvP=(DB.getSync('leaveRequests')||[]).filter(x=>x.empId===e.id&&x.status==='pending').length;
+  const clP=(DB.getSync('empClaims')||[]).filter(x=>x.empId===e.id&&x.status==='pending').length;
+  return `<div class="page-head"><div><div class="section-title">Good ${greet()}, ${e.name.split(' ')[0]} 👋</div><div class="section-sub">${e.designation} &middot; ${e.id}</div></div></div>
+  <div class="page-body">
+    <div class="card card-pad" style="margin-bottom:14px;background:${_eBg(todaySt)};border-left:4px solid ${_eColor(todaySt)};">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Today's Attendance</div>
+          <div style="font-size:24px;font-weight:800;color:${_eColor(todaySt)};margin-top:4px;">${_eLabel(todaySt)}</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px;">${today}</div>
+        </div>
+        <div style="font-size:40px;opacity:0.2;">${todaySt==='P'?'✅':todaySt==='H'?'🌓':todaySt==='A'?'❌':todaySt==='L'?'🏥':'⏳'}</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+      ${[['Present',p,'var(--green)','var(--green-bg)'],['Half Day',h,'var(--amber)','var(--amber-bg)'],['Absent',a,'var(--red)','var(--red-bg)'],['Leave',l,'var(--primary)','var(--primary-bg)'],['Pay Days',payDays,'var(--text)','var(--bg2)'],['Est. Salary','₹'+fmtN(earned),'var(--green)','var(--green-bg)']].map(([lbl,val,col,bg])=>`<div style="padding:10px 6px;background:${bg};border-radius:var(--radius);text-align:center;"><div style="font-size:17px;font-weight:800;color:${col};">${val}</div><div style="font-size:10px;color:var(--text3);margin-top:1px;">${lbl}</div></div>`).join('')}
+    </div>
+    ${(advP+lvP+clP)>0?`<div class="card card-pad" style="margin-bottom:14px;background:var(--amber-bg);border-left:4px solid var(--amber);"><div style="font-weight:700;color:var(--amber);margin-bottom:6px;">⏳ Pending Requests</div><div style="display:flex;gap:8px;flex-wrap:wrap;font-size:13px;">${advP?`<span style="background:#fff;padding:2px 10px;border-radius:20px;font-weight:600;">${advP} Advance${advP>1?'s':''}</span>`:''}${lvP?`<span style="background:#fff;padding:2px 10px;border-radius:20px;font-weight:600;">${lvP} Leave${lvP>1?'s':''}</span>`:''}${clP?`<span style="background:#fff;padding:2px 10px;border-radius:20px;font-weight:600;">${clP} Claim${clP>1?'s':''}</span>`:''}</div></div>`:''}
+    <div class="card card-pad"><div class="card-title">Quick Actions</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        ${[['📅','My Attendance','emp_attendance'],['🧾','My Payslips','emp_payslips'],['💰','Commission','emp_commission'],['💳','Cash Advance','emp_advance'],['🏥','Leave Request','emp_leave'],['🧲','Expense Claim','emp_claims'],['👤','My Profile','emp_profile']].map(([ic,lbl,pg])=>`<button onclick="navigateTo('${pg}')" style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius);background:var(--surface);cursor:pointer;font-size:13px;font-weight:600;color:var(--text);"><span style="font-size:18px;">${ic}</span>${lbl}</button>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderEmpAttendance(){
+  const e=_empData();if(!e)return'';
+  const now=new Date();
+  const selM=parseInt(document.getElementById('eatt-m')?.value||(now.getMonth()+1));
+  const selY=parseInt(document.getElementById('eatt-y')?.value||now.getFullYear());
+  const MN=['','January','February','March','April','May','June','July','August','September','October','November','December'];
+  const att=DB.getSync('attendance')||{};
+  const days=new Date(selY,selM,0).getDate();
+  const mPad=String(selM).padStart(2,'0');
+  const today=todayStr();
+  let p=0,h=0,a=0,l=0,rows=[];
+  for(let d=1;d<=days;d++){const k=`${selY}-${mPad}-${String(d).padStart(2,'0')}`;const s=(att[k]||{})[e.id]||'';if(s==='P')p++;else if(s==='H')h++;else if(s==='A')a++;else if(s==='L')l++;rows.push({d,k,s,dow:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(selY,selM-1,d).getDay()],isFuture:k>today});}
+  const payDays=Math.floor(p+h*0.5);
+  const earned=Math.round((e.salary/30)*payDays);
+  let mOpts='',yOpts='';
+  for(let i=1;i<=12;i++)mOpts+=`<option value="${i}" ${i===selM?'selected':''}>${MN[i]}</option>`;
+  for(let y=now.getFullYear();y>=now.getFullYear()-2;y--)yOpts+=`<option value="${y}" ${y===selY?'selected':''}>${y}</option>`;
+  return `<div class="page-head"><div><div class="section-title">My Attendance</div><div class="section-sub">${MN[selM]} ${selY}</div></div></div>
+  <div class="page-body">
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+      <select class="form-input" id="eatt-m" style="width:auto;" onchange="renderPage('emp_attendance')">${mOpts}</select>
+      <select class="form-input" id="eatt-y" style="width:auto;" onchange="renderPage('emp_attendance')">${yOpts}</select>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">
+      ${[['P',p,'Present','var(--green)','var(--green-bg)'],['H',h,'Half Day','var(--amber)','var(--amber-bg)'],['A',a,'Absent','var(--red)','var(--red-bg)'],['L',l,'Leave','var(--primary)','var(--primary-bg)']].map(([,v,lbl,col,bg])=>`<div style="text-align:center;padding:10px 4px;background:${bg};border-radius:var(--radius);"><div style="font-size:19px;font-weight:800;color:${col};">${v}</div><div style="font-size:10px;color:var(--text3);">${lbl}</div></div>`).join('')}
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:12px;">
+      <div class="card card-pad" style="flex:1;text-align:center;"><div style="font-size:16px;font-weight:800;">${payDays}/${days}</div><div style="font-size:11px;color:var(--text3);">Pay Days</div></div>
+      <div class="card card-pad" style="flex:1;text-align:center;background:var(--green-bg);"><div style="font-size:16px;font-weight:800;color:var(--green);">₹${fmtN(earned)}</div><div style="font-size:11px;color:var(--text3);">Est. Salary</div></div>
+    </div>
+    <div class="card" style="overflow:hidden;">
+      <div style="display:grid;grid-template-columns:46px 42px 1fr;background:#f8fafc;padding:8px 14px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);"><span>Date</span><span>Day</span><span>Status</span></div>
+      ${rows.map(({d,k,s,dow,isFuture})=>`<div style="display:grid;grid-template-columns:46px 42px 1fr;padding:8px 14px;border-bottom:1px solid var(--border);font-size:13px;${k===today?'background:var(--primary-bg);':''}${isFuture?'opacity:0.4;':''}"><span style="font-weight:600;">${String(d).padStart(2,'0')}</span><span style="color:var(--text3);font-size:12px;">${dow}</span><span>${s?`<span style="display:inline-block;padding:1px 8px;border-radius:12px;background:${_eBg(s)};color:${_eColor(s)};font-weight:700;font-size:12px;">${_eLabel(s)}</span>`:'<span style="color:var(--text3);">—</span>'}${k===today?' <span style="font-size:10px;color:var(--primary);font-weight:700;">TODAY</span>':''}</span></div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderEmpPayslips(){
+  const e=_empData();if(!e)return'';
+  const now=new Date();
+  const MN=['','January','February','March','April','May','June','July','August','September','October','November','December'];
+  const selM=parseInt(document.getElementById('epay-m')?.value||(now.getMonth()+1));
+  const selY=parseInt(document.getElementById('epay-y')?.value||now.getFullYear());
+  let mOpts='',yOpts='';
+  for(let i=1;i<=12;i++)mOpts+=`<option value="${i}" ${i===selM?'selected':''}>${MN[i]}</option>`;
+  for(let y=now.getFullYear();y>=now.getFullYear()-2;y--)yOpts+=`<option value="${y}" ${y===selY?'selected':''}>${y}</option>`;
+
+  const statuses = DB.getSync('payslipStatus')||{};
+  const slipKey  = `${e.id}-${MN[selM]}-${selY}`;
+  const st       = statuses[slipKey]||{status:'draft'};
+  const isPaid   = st.status==='paid';
+  const isLocked = st.status==='locked'||isPaid;
+
+  // Status banner for employee
+  const statusBanner = isPaid
+    ? `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#dcfdf0;border:1px solid #a3f0cc;border-radius:8px;margin-bottom:14px;">
+        <span style="font-size:20px;">✅</span>
+        <div><div style="font-weight:700;color:#0d9e6a;font-size:13px;">Salary Paid</div>
+        <div style="font-size:12px;color:#059669;">Paid on ${st.paidAt||''}${st.utr?' · Ref: '+st.utr:''}</div></div>
+       </div>`
+    : isLocked
+    ? `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;margin-bottom:14px;">
+        <span style="font-size:20px;">🔒</span>
+        <div><div style="font-weight:700;color:#1c3faa;font-size:13px;">Payslip Finalised</div>
+        <div style="font-size:12px;color:#4a5272;">Generated on ${st.lockedAt||''} · Awaiting payment</div></div>
+       </div>`
+    : `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:14px;">
+        <span style="font-size:20px;">⏳</span>
+        <div><div style="font-weight:700;color:var(--text2);font-size:13px;">Payslip Not Yet Finalised</div>
+        <div style="font-size:12px;color:var(--text3);">Admin is yet to generate and lock your payslip for this month</div></div>
+       </div>`;
+
+  return `<div class="page-head"><div><div class="section-title">My Payslips</div></div>
+    ${isLocked?`<button class="btn btn-secondary btn-sm" onclick="printSlip('${e.id}','${MN[selM]}','${selY}')">🖨️ Print</button>`:''}
+  </div>
+  <div class="page-body">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+      <select class="form-input" id="epay-m" style="width:auto;" onchange="renderPage('emp_payslips')">${mOpts}</select>
+      <select class="form-input" id="epay-y" style="width:auto;" onchange="renderPage('emp_payslips')">${yOpts}</select>
+    </div>
+    ${statusBanner}
+    ${buildPayslipHTML(e,selM,selY,MN[selM],st)}
+  </div>`;
+}
+
+function renderEmpCommission(){
+  const e=_empData();if(!e)return'';
+  const now=new Date();
+  const MN=['','January','February','March','April','May','June','July','August','September','October','November','December'];
+  const selM=parseInt(document.getElementById('ecomm-m')?.value||(now.getMonth()+1));
+  const selY=parseInt(document.getElementById('ecomm-y')?.value||now.getFullYear());
+  const fw=DB.getSync('fieldWork')||{};
+  const mFW=fw[`${MN[selM]}-${selY}`]||{};
+  const d=mFW[e.id]||{};
+  const wDays=new Date(selY,selM,0).getDate();
+  const halfDay=Math.round(e.salary/wDays/2);
+  const mt=d.mt||0,ec=d.ec||0,tc=d.tc||0,ost=d.ost||0;
+  const topTech=Math.round((tc>=30?tc*100:0)*0.70);
+  const total=ec*400+topTech+ost*halfDay;
+  const fwSt=mFW._status||'draft';
+  let mOpts='',yOpts='';
+  for(let i=1;i<=12;i++)mOpts+=`<option value="${i}" ${i===selM?'selected':''}>${MN[i]}</option>`;
+  for(let y=now.getFullYear();y>=now.getFullYear()-2;y--)yOpts+=`<option value="${y}" ${y===selY?'selected':''}>${y}</option>`;
+  const badge=fwSt==='approved_admin'?'<span class="badge badge-green">✅ Approved</span>':fwSt==='pending_admin'?'<span class="badge badge-amber">⏳ Pending</span>':'<span class="badge badge-gray">Draft</span>';
+  return `<div class="page-head"><div><div class="section-title">My Commission</div></div></div>
+  <div class="page-body">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+      <select class="form-input" id="ecomm-m" style="width:auto;" onchange="renderPage('emp_commission')">${mOpts}</select>
+      <select class="form-input" id="ecomm-y" style="width:auto;" onchange="renderPage('emp_commission')">${yOpts}</select>
+      ${badge}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      ${[['🧲 Magnet GPS',mt+' units','Count only — no commission','var(--text3)','var(--bg2)'],
+         ['⚙️ Eng/Cut',ec+' units','₹'+fmtN(ec*400)+' earned','var(--green)','var(--green-bg)'],
+         ['💻 Tech GPS',tc+' installs',tc>=30?'₹'+fmtN(tc*100)+' (you get 70%)':'Need 30+ for bonus','var(--purple)',tc>=30?'#f5f3ff':'var(--bg2)'],
+         ['🚗 Outstation',ost+' trips','₹'+fmtN(ost*halfDay)+' earned','var(--orange)','var(--amber-bg)']].map(([lbl,v,sub,col,bg])=>`<div class="card card-pad" style="background:${bg};"><div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:4px;">${lbl}</div><div style="font-size:18px;font-weight:800;color:${col};">${v}</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">${sub}</div></div>`).join('')}
+    </div>
+    <div class="card card-pad" style="background:var(--green-bg);border-left:4px solid var(--green);margin-bottom:12px;">
+      <div style="font-size:12px;color:var(--text3);">Total Commission — ${MN[selM]} ${selY}</div>
+      <div style="font-size:28px;font-weight:800;color:var(--green);margin-top:4px;">₹${fmtN(total)}</div>
+    </div>
+    ${total===0?'<div style="padding:12px;background:var(--bg2);border-radius:var(--radius);font-size:13px;color:var(--text3);">No field work data recorded for this month yet.</div>':''}
+  </div>`;
+}
+
+function renderEmpAdvance(){
+  const e=_empData();if(!e)return'';
+  const adv=(DB.getSync('salaryAdvances')||[]).filter(x=>x.empId===e.id).sort((a,b)=>(b.requestedAt||'').localeCompare(a.requestedAt||''));
+  const bdg=s=>s==='approved'?'<span class="badge badge-green">✅ Approved</span>':s==='pending'?'<span class="badge badge-amber">⏳ Pending</span>':'<span class="badge badge-red">❌ Rejected</span>';
+  return `<div class="page-head"><div><div class="section-title">Cash Advance</div></div>
+    <button class="btn btn-primary btn-sm" onclick="empRequestAdvance()">+ Request</button>
+  </div>
+  <div class="page-body">
+    ${adv.length===0?`<div class="empty-state"><div class="empty-icon">💳</div><div class="empty-title">No advance requests yet</div></div>`:
+    `<div class="card">${adv.map(a=>`<div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-weight:700;">₹${fmtN(a.amount)}</div><div style="font-size:12px;color:var(--text3);margin-top:2px;">${a.reason||'—'}</div><div style="font-size:11px;color:var(--text3);margin-top:1px;">${(a.requestedAt||'').slice(0,10)}</div></div>${bdg(a.status)}</div>`).join('')}</div>`}
+  </div>`;
+}
+function empRequestAdvance(){
+  openModal('Request Cash Advance',`<div class="form-grid" style="gap:14px;margin-bottom:16px;"><div class="form-group full"><label class="form-label">Amount (₹) *</label><input class="form-input" type="number" id="ea-amt" placeholder="e.g. 5000" min="100"></div><div class="form-group full"><label class="form-label">Reason *</label><input class="form-input" id="ea-reason" placeholder="Reason for advance"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="empSubmitAdvance()">📤 Submit</button></div>`);
+}
+function empSubmitAdvance(){
+  const e=_empData();
+  const amt=parseFloat(document.getElementById('ea-amt')?.value);
+  const reason=document.getElementById('ea-reason')?.value?.trim();
+  if(!amt||amt<100){showToast('Enter a valid amount (min ₹100)','error');return;}
+  if(!reason){showToast('Reason is required','error');return;}
+  const {month,year}=curMY();
+  const adv=DB.getSync('salaryAdvances')||[];
+  adv.push({id:'ADV'+Date.now(),empId:e.id,empName:e.name,amount:amt,reason,month,year,status:'pending',requestedAt:new Date().toISOString(),deductionType:'onetime'});
+  DB.setSync('salaryAdvances',adv);closeModal();renderSidebar();showToast('✅ Advance request submitted','success');renderPage('emp_advance');
+}
+
+function renderEmpLeave(){
+  const e=_empData();if(!e)return'';
+  const lvs=(DB.getSync('leaveRequests')||[]).filter(x=>x.empId===e.id).sort((a,b)=>(b.requestedAt||'').localeCompare(a.requestedAt||''));
+  const bdg=s=>s==='approved'?'<span class="badge badge-green">✅ Approved</span>':s==='pending'?'<span class="badge badge-amber">⏳ Pending</span>':'<span class="badge badge-red">❌ Rejected</span>';
+  return `<div class="page-head"><div><div class="section-title">Leave Requests</div></div>
+    <button class="btn btn-primary btn-sm" onclick="empRequestLeave()">+ Request</button>
+  </div>
+  <div class="page-body">
+    ${lvs.length===0?`<div class="empty-state"><div class="empty-icon">🏥</div><div class="empty-title">No leave requests yet</div></div>`:
+    `<div class="card">${lvs.map(lv=>`<div style="padding:12px 16px;border-bottom:1px solid var(--border);"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:4px;"><div style="font-weight:700;">${lv.fromDate}${lv.toDate&&lv.toDate!==lv.fromDate?' → '+lv.toDate:''}</div>${bdg(lv.status)}</div><div style="font-size:12px;color:var(--text3);">${lv.leaveType||'Leave'} &middot; ${lv.reason||'—'}</div>${lv.adminNote?`<div style="font-size:12px;margin-top:3px;color:var(--primary);font-style:italic;">${lv.adminNote}</div>`:''}</div>`).join('')}</div>`}
+  </div>`;
+}
+function empRequestLeave(){
+  const today=todayStr();
+  openModal('Request Leave',`<div class="form-grid" style="gap:14px;margin-bottom:16px;"><div class="form-group full"><label class="form-label">Leave Type *</label><select class="form-input" id="el-type"><option>Casual Leave</option><option>Sick Leave</option><option>Earned Leave</option><option>Permission (Half Day)</option><option>Other</option></select></div><div class="form-group"><label class="form-label">From Date *</label><input class="form-input" type="date" id="el-from" value="${today}"></div><div class="form-group"><label class="form-label">To Date</label><input class="form-input" type="date" id="el-to" value="${today}"></div><div class="form-group full"><label class="form-label">Reason *</label><input class="form-input" id="el-reason" placeholder="Reason for leave"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="empSubmitLeave()">📤 Submit</button></div>`);
+}
+function empSubmitLeave(){
+  const e=_empData();
+  const ltype=document.getElementById('el-type')?.value;
+  const fromDate=document.getElementById('el-from')?.value;
+  const toDate=document.getElementById('el-to')?.value||fromDate;
+  const reason=document.getElementById('el-reason')?.value?.trim();
+  if(!fromDate||!reason){showToast('All fields required','error');return;}
+  const reqs=DB.getSync('leaveRequests')||[];
+  reqs.push({id:'LV'+Date.now(),empId:e.id,empName:e.name,leaveType:ltype,fromDate,toDate,reason,status:'pending',requestedAt:new Date().toISOString()});
+  DB.setSync('leaveRequests',reqs);
+  closeModal();
+  renderSidebar();
+  showToast('✅ Leave request submitted','success');
+  renderPage('emp_leave');
+  // Send email notification
+  fetch('https://floralwhite-locust-819146.hostingersite.com/send-leave-mail.php',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({empId:e.id,empName:e.name,leaveType:ltype,fromDate,toDate,reason})
+  }).then(r=>r.json()).then(d=>{
+    if(d.ok) showToast('📧 Notification sent to admin','success');
+    else console.warn('Mail error:',d.error);
+  }).catch(err=>console.warn('Mail fetch error:',err));
+}
+
+function renderEmpClaims(){
+  const e=_empData();if(!e)return'';
+  const submitted=(DB.getSync('empClaims')||[]).filter(x=>x.empId===e.id).sort((a,b)=>(b.submittedAt||'').localeCompare(a.submittedAt||''));
+  const drafts=JSON.parse(sessionStorage.getItem('claimDrafts')||'[]');
+  const bdg=s=>s==='approved'?'<span class="badge badge-green">✅ Approved</span>':s==='pending'?'<span class="badge badge-amber">⏳ Pending</span>':'<span class="badge badge-red">❌ Rejected</span>';
+  const cats=['Travel / Transport','Food / Meals','Tools / Equipment','Mobile / Internet','Medical','Other'];
+  const today=todayStr();
+  return `<div class="page-head">
+    <div><div class="section-title">Expense Claims</div><div class="section-sub">Add claims and submit all at once</div></div>
+  </div>
+  <div class="page-body">
+    <div class="card card-pad" style="margin-bottom:16px;">
+      <div class="card-title" style="margin-bottom:14px;">➕ Add New Claim</div>
+      <div class="form-grid" style="gap:12px;margin-bottom:14px;">
+        <div class="form-group"><label class="form-label">Category *</label><select class="form-input" id="ec-cat">${cats.map(c=>`<option>${c}</option>`).join('')}</select></div>
+        <div class="form-group"><label class="form-label">Date *</label><input class="form-input" type="date" id="ec-date" value="${today}"></div>
+        <div class="form-group"><label class="form-label">Amount (₹) *</label><input class="form-input" type="number" id="ec-amt" placeholder="0" min="1"></div>
+        <div class="form-group full"><label class="form-label">Description *</label><input class="form-input" id="ec-desc" placeholder="Brief description of the expense"></div>
+        <div class="form-group"><label class="form-label">Task Number</label><input class="form-input" id="ec-task-no" placeholder="e.g. BGT-1042"></div>
+        <div class="form-group"><label class="form-label">Task Date</label><input class="form-input" type="date" id="ec-task-date"></div>
+      </div>
+      <button class="btn btn-secondary" onclick="empSaveDraft()">💾 Save Claim</button>
+    </div>
+    ${drafts.length>0?`
+    <div class="card card-pad" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div class="card-title" style="margin:0;">📋 Saved Drafts <span style="font-size:12px;color:var(--text3);font-weight:400;">(not submitted yet)</span></div>
+        <div style="font-weight:800;font-size:15px;color:var(--orange);">Total: ₹${fmtN(drafts.reduce((s,d)=>s+d.amount,0))}</div>
+      </div>
+      ${drafts.map((d,i)=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;">
+          <div>
+            <div style="font-weight:700;font-size:13px;">₹${fmtN(d.amount)} &middot; <span style="color:var(--primary);">${d.category}</span></div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px;">${d.description} &middot; ${d.date}${d.taskNo?` &middot; <span style="color:var(--primary);font-weight:600;">Task: ${d.taskNo}</span>`:''}${d.taskDate?` &middot; ${d.taskDate}`:''}</div>
+          </div>
+          <button onclick="empRemoveDraft(${i})" style="background:var(--red-bg);color:var(--red);border:none;border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;">✕</button>
+        </div>`).join('')}
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;">
+        <button class="btn btn-primary" onclick="empSubmitAllClaims()">📤 Submit All ${drafts.length} Claim${drafts.length>1?'s':''} to Admin</button>
+      </div>
+    </div>`:`<div style="padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);font-size:13px;color:var(--text3);margin-bottom:16px;">
+      💡 Fill the form above and click <strong>Save Claim</strong> to add to your list, then submit all together.
+    </div>`}
+    <div class="card card-pad">
+      <div class="card-title" style="margin-bottom:12px;">📂 Submission History</div>
+      ${submitted.length===0
+        ?`<div class="empty-state" style="padding:24px 0;"><div class="empty-icon">🧾</div><div class="empty-title">No claims submitted yet</div></div>`
+        :submitted.map(cl=>`<div style="padding:11px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+            <div>
+              <div style="font-weight:700;font-size:13px;">₹${fmtN(cl.amount)} &middot; ${cl.category||'General'}</div>
+              <div style="font-size:12px;color:var(--text3);margin-top:2px;">${cl.description||'—'} &middot; ${cl.date||''}${cl.taskNo?` &middot; <span style="color:var(--primary);font-weight:600;">Task: ${cl.taskNo}</span>`:''}${cl.taskDate?` &middot; ${cl.taskDate}`:''}</div>
+              ${cl.adminNote?`<div style="font-size:12px;color:var(--primary);font-style:italic;margin-top:3px;">${cl.adminNote}</div>`:''}
+            </div>
+            ${bdg(cl.status)}
+          </div>`).join('')}
+    </div>
+  </div>`;
+}
+function empSaveDraft(){
+  const cat=document.getElementById('ec-cat')?.value;
+  const date=document.getElementById('ec-date')?.value;
+  const amt=parseFloat(document.getElementById('ec-amt')?.value);
+  const desc=document.getElementById('ec-desc')?.value?.trim();
+  if(!date||!amt||amt<1||!desc){showToast('All fields required','error');return;}
+  const taskNo=document.getElementById('ec-task-no')?.value?.trim();
+  const taskDate=document.getElementById('ec-task-date')?.value;
+  const drafts=JSON.parse(sessionStorage.getItem('claimDrafts')||'[]');
+  drafts.push({category:cat,date,amount:amt,description:desc,taskNo:taskNo||'',taskDate:taskDate||''});
+  sessionStorage.setItem('claimDrafts',JSON.stringify(drafts));
+  document.getElementById('ec-amt').value='';
+  document.getElementById('ec-desc').value='';
+  document.getElementById('ec-task-no').value='';
+  document.getElementById('ec-task-date').value='';
+  showToast(`✅ Saved — ${drafts.length} draft${drafts.length>1?'s':''} ready`,'success');
+  renderPage('emp_claims');
+}
+function empRemoveDraft(idx){
+  const drafts=JSON.parse(sessionStorage.getItem('claimDrafts')||'[]');
+  drafts.splice(idx,1);
+  sessionStorage.setItem('claimDrafts',JSON.stringify(drafts));
+  renderPage('emp_claims');
+}
+function empSubmitAllClaims(){
+  const e=_empData();
+  const drafts=JSON.parse(sessionStorage.getItem('claimDrafts')||'[]');
+  if(!drafts.length){showToast('No drafts to submit','error');return;}
+  const cls=DB.getSync('empClaims')||[];
+  const batchId='BATCH'+Date.now();
+  drafts.forEach(d=>{cls.push({id:'CLM'+Date.now()+'_'+Math.random().toString(36).slice(2,6),batchId,empId:e.id,empName:e.name,category:d.category,date:d.date,amount:d.amount,description:d.description,taskNo:d.taskNo||'',taskDate:d.taskDate||'',status:'pending',submittedAt:new Date().toISOString()});});
+  DB.setSync('empClaims',cls);
+  sessionStorage.removeItem('claimDrafts');
+  showToast(`✅ ${drafts.length} claim${drafts.length>1?'s':''} submitted to admin`,'success');
+  renderPage('emp_claims');
+}
+function empSubmitClaimModal(){empSaveDraft();}
+function empSubmitClaim(){empSubmitAllClaims();}
+
+function renderEmpProfile(){
+  const e=_empData();if(!e)return'';
+  return `<div class="page-head"><div><div class="section-title">My Profile</div><div class="section-sub">${e.id}</div></div></div>
+  <div class="page-body">
+    <div class="card card-pad" style="margin-bottom:14px;"><div class="card-title">Personal Information</div>
+      ${[['Name',e.name],['Designation',e.designation],['Department',e.department||'—'],['Phone',e.phone||'—'],['Email',e.email||'—'],['Join Date',e.joinDate||'—'],['Location',e.location||'—']].map(([l,v])=>`<div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="min-width:110px;color:var(--text3);font-size:12px;">${l}</span><span style="font-weight:600;">${v}</span></div>`).join('')}
+    </div>
+    <div class="card card-pad" style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><div class="card-title" style="margin:0;">🏦 Bank Details</div><button class="btn btn-secondary btn-sm" onclick="empEditBank()">✏️ Update</button></div>
+      ${[['Bank',e.bank||'—'],['Account No.',e.bankAccount||'—'],['IFSC',e.ifsc||'—']].map(([l,v])=>`<div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="min-width:110px;color:var(--text3);font-size:12px;">${l}</span><span style="font-weight:600;font-family:var(--mono);">${v}</span></div>`).join('')}
+    </div>
+    <div class="card card-pad">
+      <div class="card-title">🔒 Change Password</div>
+      <div class="form-grid" style="gap:12px;margin-bottom:12px;">
+        <div class="form-group full"><label class="form-label">Current Password</label><input class="form-input" type="password" id="ep-cur" placeholder="Current password"></div>
+        <div class="form-group"><label class="form-label">New Password</label><input class="form-input" type="password" id="ep-new" placeholder="Min 4 chars"></div>
+        <div class="form-group"><label class="form-label">Confirm Password</label><input class="form-input" type="password" id="ep-conf" placeholder="Repeat"></div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="empChangePassword()">Update Password</button>
+    </div>
+  </div>`;
+}
+function empEditBank(){
+  const e=_empData();
+  openModal('Update Bank Details',`<div style="padding:10px 14px;background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--radius);margin-bottom:14px;font-size:13px;">⚠️ Changes visible to Admin.</div><div class="form-grid" style="gap:14px;margin-bottom:16px;"><div class="form-group full"><label class="form-label">Bank Name *</label><input class="form-input" id="eb-bank" value="${e.bank||''}" placeholder="e.g. SBI, HDFC Bank"></div><div class="form-group"><label class="form-label">Account Number *</label><input class="form-input" id="eb-acct" value="${e.bankAccount||''}" placeholder="Account number"></div><div class="form-group"><label class="form-label">IFSC Code *</label><input class="form-input" id="eb-ifsc" value="${e.ifsc||''}" placeholder="e.g. SBIN0001234"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="empSaveBank()">💾 Save</button></div>`);
+}
+function empSaveBank(){
+  const e=_empData();
+  const bank=document.getElementById('eb-bank')?.value?.trim();
+  const acct=document.getElementById('eb-acct')?.value?.trim();
+  const ifsc=document.getElementById('eb-ifsc')?.value?.trim().toUpperCase();
+  if(!bank||!acct||!ifsc){showToast('All fields required','error');return;}
+  const emps=DB.getSync('employees')||[];
+  const idx=emps.findIndex(x=>x.id===e.id);
+  if(idx>=0){emps[idx].bank=bank;emps[idx].bankAccount=acct;emps[idx].ifsc=ifsc;DB.setSync('employees',emps);}
+  closeModal();showToast('✅ Bank details updated','success');renderPage('emp_profile');
+}
+function empChangePassword(){
+  const e=_empData();
+  const cur=document.getElementById('ep-cur')?.value;
+  const newp=document.getElementById('ep-new')?.value;
+  const conf=document.getElementById('ep-conf')?.value;
+  if(!cur||!newp||!conf){showToast('All fields required','error');return;}
+  if(newp!==conf){showToast('Passwords do not match','error');return;}
+  if(newp.length<4){showToast('Minimum 4 characters','error');return;}
+  const empPwds=DB.getSync('empPasswords')||{};
+  const stored=empPwds[e.id]!==undefined?empPwds[e.id]:(e.phone||e.id.toLowerCase());
+  if(cur!==stored){showToast('Current password incorrect','error');return;}
+  empPwds[e.id]=newp;DB.setSync('empPasswords',empPwds);
+  showToast('✅ Password updated','success');
+  ['ep-cur','ep-new','ep-conf'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+}
+function adminApproveClaim(id,approve){
+  const cls=DB.getSync('empClaims')||[];
+  const idx=cls.findIndex(c=>c.id===id);if(idx<0)return;
+  cls[idx].status=approve?'approved':'rejected';cls[idx].reviewedBy=currentUser.username;cls[idx].reviewedAt=new Date().toISOString();
+  DB.setSync('empClaims',cls);showToast(approve?'✅ Approved':'❌ Rejected','success');renderPage(currentPage);
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+function updateClock() {
+  const el = document.getElementById('topbarClock');
+  if(el) el.textContent = new Date().toLocaleString('en-IN',{weekday:'short',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+async function initApp() {
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('mainArea').innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;">
+      <div style="width:44px;height:44px;border:4px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+      <div style="font-size:14px;color:var(--text3);font-weight:600;">Loading your data...</div>
+    </div>
+    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
+  try {
+    await _loadFirebase();
+    await DB.loadAll();
+    _startFirebaseListener();
+    updateClock();
+    setInterval(updateClock, 30000);
+    renderSidebar();
+    navigateTo('emp_home');
+  } catch(err) {
+    document.getElementById('mainArea').innerHTML = `
+      <div class="page-body"><div class="card card-pad" style="border-left:4px solid var(--red);">
+        <div style="font-weight:700;color:var(--red);margin-bottom:8px;">⚠️ Load Error</div>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--text2);">${err.message}</div>
+        <button class="btn btn-primary btn-sm" style="margin-top:12px;" onclick="initApp()">↺ Retry</button>
+      </div></div>`;
+    console.error('[initApp]', err);
+  }
+}
+
+// Restore session on page load
+window.addEventListener('DOMContentLoaded', async () => {
+  const saved = sessionStorage.getItem('ep_session');
+  if(saved) {
+    try {
+      currentUser = JSON.parse(saved);
+      document.getElementById('loginScreen').style.display = 'none';
+      initApp();
+      return;
+    } catch(e) {}
+  }
+  // Pre-load Firebase — show subtle status on button
+  const btn = document.querySelector('.btn-login');
+  if(btn){ btn.textContent = 'Connecting...'; btn.disabled = true; }
+  await _loadFirebase();
+  await DB.loadAll();
+  _startFirebaseListener();
+  if(btn){ btn.textContent = 'Sign In →'; btn.disabled = false; }
+});
+
+</script>
+</body>
+</html>
