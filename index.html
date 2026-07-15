@@ -2446,7 +2446,9 @@ function buildFWTable() {
   <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
     ${(()=>{
       if(monthLocked) return `<span class="badge badge-red" style="padding:10px 18px;font-size:13px;">🔒 Month Locked by Admin</span>`;
-      if(fwStatus==='approved_admin') return `<span class="badge badge-green" style="padding:10px 18px;font-size:13px;">✅ Commissions Applied to Payroll</span>`;
+      if(fwStatus==='approved_admin') return `
+        <span class="badge badge-green" style="padding:10px 18px;font-size:13px;">✅ Commissions Applied to Payroll</span>
+        ${isAdmin ? `<button class="btn btn-secondary btn-sm" onclick="revokeFWCommissions('${key}')">↩ Revoke Commission</button>` : ''}`;
       if(fwStatus==='pending_admin' && isAdmin) return `
         <button class="btn btn-primary" onclick="_applyFWCommissions('${key}')">✅ Approve & Apply Commissions to Payroll</button>
         <button class="btn btn-danger btn-sm" onclick="rejectFW('${key}')">✗ Reject — Send Back to Manager</button>`;
@@ -2942,6 +2944,56 @@ function rejectFW(key) {
   DB.setSync('fieldWork', fw);
   renderSidebar();
   showToast(`Field work for ${key} rejected — Manager needs to revise`, 'info');
+  renderPage('field_work');
+}
+
+function revokeFWCommissions(key) {
+  openModal('↩ Revoke Commission', `
+    <div style="padding:12px 14px;background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--radius);margin-bottom:16px;font-size:13px;color:var(--amber);font-weight:600;">
+      ⚠️ This will revoke the commission approval for <strong>${key}</strong>.<br>
+      <span style="font-weight:400;color:var(--text2);">Field work data and entries will NOT be deleted. Status will go back to pending so you can re-approve after corrections.</span>
+    </div>
+    <div class="form-group" style="margin-bottom:4px;">
+      <label class="form-label">Reason for revoking <span>*</span></label>
+      <input class="form-input" id="revoke-reason" placeholder="e.g. Wrong commission applied, need to correct">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmRevokeFW('${key}')">↩ Revoke Commission</button>
+    </div>`);
+}
+
+function confirmRevokeFW(key) {
+  const reason = document.getElementById('revoke-reason')?.value?.trim();
+  if(!reason) { showToast('Reason is required', 'error'); return; }
+  requirePasscode('Revoke Commission — '+key, 'Revoke commission approval for '+key+'? Data stays intact.', ()=>_doRevokeFW(key, reason));
+}
+
+function _doRevokeFW(key, reason) {
+  const fw = DB.getSync('fieldWork')||{};
+  if(!fw[key]) return;
+  // Revert status to pending_admin — data untouched
+  fw[key]._status       = 'pending_admin';
+  fw[key]._revokedBy    = currentUser.username;
+  fw[key]._revokedAt    = new Date().toISOString();
+  fw[key]._revokeReason = reason;
+  delete fw[key]._approvedBy;
+  delete fw[key]._approvedAt;
+  DB.setSync('fieldWork', fw);
+  // Clear commissions for this period so payroll is not affected
+  const parts = key.split('-');
+  const mNms  = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+  const m     = mNms.indexOf(parts[0])+1;
+  const y     = parseInt(parts[1]);
+  const applyDate = `${y}-${String(m).padStart(2,'0')}-01`;
+  const comm  = DB.getSync('commissions')||{};
+  delete comm[applyDate];
+  DB.setSync('commissions', comm);
+  // Log the action
+  _logAdminAction('fw_commission_revoked', {key, reason, by:currentUser.username});
+  closeModal();
+  showToast(`↩ Commission revoked for ${key} — data intact, ready to re-approve`, 'success');
+  renderSidebar();
   renderPage('field_work');
 }
 
