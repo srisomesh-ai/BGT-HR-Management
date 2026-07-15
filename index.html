@@ -2235,8 +2235,10 @@ function buildFWTable() {
     const ecOff    = isNoComm ? 0 : ec * 100;      // ₹100/engcut for office pool
     const ostAmt   = isNoComm ? 0 : ost * halfDay; // outstation
 
-    // Topper: based on this employee's tech GPS count
-    const topperTotal  = (!isNoComm && tc >= 30) ? tc * 100 : 0;
+    // Topper: tc>=30 activates bonus, but EC devices excluded from ₹100 bonus
+    // pureTC = tc - ec (pure GPS installs only get ₹100)
+    const pureTC       = Math.max(0, tc - ec);
+    const topperTotal  = (!isNoComm && tc >= 30) ? pureTC * 100 : 0;
     const topperTech   = Math.round(topperTotal * 0.70);
     const topperOff    = Math.round(topperTotal * 0.30);
 
@@ -2818,7 +2820,8 @@ function recalcFWRow(empId, key, workDays, halfDay) {
   const isNoComm = NO_COMM_IDS.includes(empId);
 
   const ecTech     = isNoComm ? 0 : ec * 400;
-  const topTotal   = (!isNoComm && tc >= 30) ? tc * 100 : 0;
+  const pureTC     = Math.max(0, tc - ec); // EC excluded from ₹100 bonus
+  const topTotal   = (!isNoComm && tc >= 30) ? pureTC * 100 : 0;
   const topTech    = Math.round(topTotal * 0.70);
   const ostAmt     = isNoComm ? 0 : ost * halfDay;
   const techEarned = ecTech + topTech + ostAmt; // mt has no commission, BGT001 has no commission
@@ -2905,7 +2908,8 @@ function _applyFWCommissions(key) {
     const mt=d.mt||0, ec=d.ec||0, tc=d.tc||0, ost=d.ost||0;
     // Skip all commission calculation for NO_COMM_IDS
     if(isNoComm) return;
-    const topTotal = tc>=30 ? tc*100 : 0;
+    const pureTC   = Math.max(0, tc - ec); // EC excluded from ₹100 bonus
+    const topTotal = tc>=30 ? pureTC*100 : 0;
     const topTech  = Math.round(topTotal*0.70);
     const topOff   = Math.round(topTotal*0.30);
     totECOff  += ec*100;
