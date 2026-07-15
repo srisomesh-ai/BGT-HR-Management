@@ -2559,11 +2559,11 @@ function checkFWResetConfirm(key) {
 }
 
 function confirmResetFWMonth(key) {
-  requirePasscode('Reset Field Work Month', 'Delete ALL field work entries for this month?', ()=>_doConfirmResetFWMonth(key));
-}
-function _doConfirmResetFWMonth(key) {
   const reason = document.getElementById('fwreset-reason')?.value?.trim();
   if(!reason) { showToast('Reason is required', 'error'); return; }
+  requirePasscode('Reset Field Work Month', 'Delete ALL field work entries for this month?', ()=>_doConfirmResetFWMonth(key, reason));
+}
+function _doConfirmResetFWMonth(key, reason) {
   const fw = DB.getSync('fieldWork')||{};
   const old = JSON.stringify(fw[key]||{});
   delete fw[key];
@@ -3211,11 +3211,11 @@ function quickResetFW(key) {
 }
 
 function doQuickResetFW(key) {
-  requirePasscode('Delete FW Data', 'Delete field work data for this month?', ()=>_doQuickResetFW(key));
-}
-function _doQuickResetFW(key) {
   const reason = document.getElementById('qrf-reason')?.value?.trim();
   if(!reason) { showToast('Reason is required', 'error'); return; }
+  requirePasscode('Delete FW Data', 'Delete field work data for this month?', ()=>_doQuickResetFW(key, reason));
+}
+function _doQuickResetFW(key, reason) {
   const fw  = DB.getSync('fieldWork')||{};
   const old = JSON.stringify(fw[key]||{});
   delete fw[key];
