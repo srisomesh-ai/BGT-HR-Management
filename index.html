@@ -3922,7 +3922,7 @@ function buildSalaryHistory(empId) {
             if(ded[k]?.[empId])  td+=ded[k][empId];
           }
           const paidDays2   = p + Math.floor(h/2);
-          const absentDays2 = a + (h%2);
+          const absentDays2 = Math.max(0, 30 - paidDays2);
           const absentDed2  = Math.round(absentDays2 * (e.salary/30));
           const earned      = e.salary - absentDed2;
           const pf  = e.pfApplicable ? Math.round((e.basicSalary||e.salary/2)*0.12) : 0;
