@@ -4363,17 +4363,33 @@ function renderLeaveRequestsAdmin() {
     const all = DB.getSync('leaveRequests')||[];
     const idx = all.findIndex(r=>r.id===id); if(idx<0) return;
     all[idx].status='approved'; all[idx].adminNote=note; all[idx].reviewedBy=currentUser.username; all[idx].reviewedAt=new Date().toISOString();
-    DB.setSync('leaveRequests',all); renderSidebar(); renderPage('leave_requests'); showToast('✅ Leave approved','success');
-    // Send approval email to employee
+    DB.setSync('leaveRequests',all);
+
+    // ── Auto-mark attendance as L for approved leave dates ──
     const req = all[idx];
-    const emp = (DB.getSync('employees')||[]).find(e=>e.id===req.empId)||{};
+    if(req.fromDate) {
+      const att  = DB.getSync('attendance')||{};
+      const from = new Date(req.fromDate);
+      const to   = new Date(req.toDate||req.fromDate);
+      for(let d=new Date(from); d<=to; d.setDate(d.getDate()+1)) {
+        const key = d.toISOString().slice(0,10); // YYYY-MM-DD
+        if(!att[key]) att[key] = {};
+        att[key][req.empId] = 'L';
+      }
+      DB.setSync('attendance', att);
+    }
+
+    renderSidebar(); renderPage('leave_requests'); showToast('✅ Leave approved and attendance updated','success');
+    // Send approval email to employee
+    const req2 = all[idx];
+    const emp = (DB.getSync('employees')||[]).find(e=>e.id===req2.empId)||{};
     if(emp.email) {
       fetch('https://floralwhite-locust-819146.hostingersite.com/send-leave-approval-mail.php', {
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body: JSON.stringify({
-          empId:req.empId, empName:req.empName||emp.name, empEmail:emp.email,
-          leaveType:req.leaveType, fromDate:req.fromDate, toDate:req.toDate,
+          empId:req2.empId, empName:req2.empName||emp.name, empEmail:emp.email,
+          leaveType:req2.leaveType, fromDate:req2.fromDate, toDate:req2.toDate,
           adminNote:note, status:'approved'
         })
       }).then(r=>r.json()).then(d=>{
