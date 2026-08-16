@@ -4977,19 +4977,63 @@ function renderPayslipPage() {
   </div></div>`;
 }
 
+// ── Shared salary calculator — same logic as buildPayslipHTML ──
+function calcNetSalary(e, m, y, mName) {
+  const att  = DB.getSync('attendance')||{};
+  const comm = DB.getSync('commissions')||{};
+  const ded  = DB.getSync('deductions')||{};
+  const advances = DB.getSync('salaryAdvances')||[];
+  const days = new Date(y,m,0).getDate();
+  let p=0,h=0,tc=0,td=0;
+  for(let d=1;d<=days;d++){
+    const k=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const s=(att[k]||{})[e.id];
+    if(s==='P')p++;else if(s==='H')h++;
+    if(comm[k]?.[e.id]) tc+=comm[k][e.id];
+    if(ded[k]?.[e.id])  td+=ded[k][e.id];
+  }
+  const paidDays   = p + Math.floor(h/2);
+  const absentDays = Math.max(0, 30 - paidDays);
+  const absentDed  = Math.round(absentDays * (e.salary/30));
+  const fw     = DB.getSync('fieldWork')||{};
+  const fwData = (fw[`${mName}-${y}`]||{})[e.id]||{};
+  const NO_COMM_IDS = ['BGT001'];
+  const isNoComm = NO_COMM_IDS.includes(e.id);
+  const fwEC  = fwData.ec||0;
+  const fwTC  = fwData.tc||0;
+  const fwOST = fwData.ost||0;
+  const pureTC   = Math.max(0, fwTC - fwEC);
+  const ecComm   = isNoComm ? 0 : fwEC * 400;
+  const topTotal = (!isNoComm && fwTC >= 30) ? pureTC * 100 : 0;
+  const topTech  = Math.round(topTotal * 0.70);
+  const ostComm  = isNoComm ? 0 : fwOST * 300;
+  const fwTotal  = ecComm + topTech + ostComm;
+  const grossEarnings = (e.salary - absentDed) + fwTotal;
+  const pf   = e.pfApplicable   ? Math.round((e.basicSalary||e.salary/2)*0.12) : 0;
+  const esic = e.esicApplicable ? Math.round(grossEarnings*0.0075) : 0;
+  const advOnetime = advances.filter(x=>
+    x.empId===e.id && x.status==='approved' &&
+    (!x.deductionType||x.deductionType==='onetime') &&
+    x.month===mName && String(x.year)===String(y)
+  ).reduce((s,x)=>s+x.amount,0);
+  const advMonthly = advances.filter(x=>{
+    if(x.empId!==e.id||x.status!=='approved'||x.deductionType!=='monthly') return false;
+    const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const startIdx = months.indexOf(x.emiStartMonth||x.month)*1 + (parseInt(x.emiStartYear||x.year)-2020)*12;
+    const curIdx   = months.indexOf(mName)*1 + (parseInt(y)-2020)*12;
+    const monthsElapsed = curIdx - startIdx;
+    return monthsElapsed>=0 && monthsElapsed<(x.emiMonths||1);
+  }).reduce((s,x)=>s+(x.emiAmount||0),0);
+  const adv = advOnetime + advMonthly;
+  return Math.max(0, e.salary + fwTotal - absentDed - pf - esic - td - adv);
+}
+
 function showSalaryTotal() {
   const m     = parseInt(document.getElementById('ps-m').value);
   const y     = parseInt(document.getElementById('ps-y').value);
   const mName = ['','January','February','March','April','May','June','July','August','September','October','November','December'][m];
   const emps  = (DB.getSync('employees')||[]).filter(e=>e.status==='active');
   const statuses = DB.getSync('payslipStatus')||{};
-  const att   = DB.getSync('attendance')||{};
-  const comm  = DB.getSync('commissions')||{};
-  const ded   = DB.getSync('deductions')||{};
-  const fw    = DB.getSync('fieldWork')||{};
-  const advances = DB.getSync('salaryAdvances')||[];
-  const NO_COMM_IDS = ['BGT001'];
-  const days  = new Date(y,m,0).getDate();
 
   let rows = '';
   let grandTotal = 0;
@@ -4998,43 +5042,19 @@ function showSalaryTotal() {
   emps.forEach(e => {
     const key  = `${e.id}-${mName}-${y}`;
     const st   = statuses[key]||{status:'draft'};
-    let p=0,h=0,tc=0,td=0;
-    for(let d=1;d<=days;d++){
-      const k=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      const s=(att[k]||{})[e.id];
-      if(s==='P')p++;else if(s==='H')h++;
-      if(comm[k]?.[e.id]) tc+=comm[k][e.id];
-      if(ded[k]?.[e.id])  td+=ded[k][e.id];
-    }
-    const fwData  = (fw[`${mName}-${y}`]||{})[e.id]||{};
-    const isNoComm= NO_COMM_IDS.includes(e.id);
-    const pureTC  = Math.max(0,(fwData.tc||0)-(fwData.ec||0));
-    const ecComm  = isNoComm?0:(fwData.ec||0)*400;
-    const topTech = Math.round(((!isNoComm&&(fwData.tc||0)>=30)?pureTC*100:0)*0.70);
-    const ostComm = isNoComm?0:(fwData.ost||0)*300;
-    const fwTotal = ecComm+topTech+ostComm;
-    const paidDays   = p+Math.floor(h/2);
-    const absentDays = Math.max(0,30-paidDays);
-    const absentDed  = Math.round(absentDays*(e.salary/30));
-    const pf   = e.pfApplicable   ? Math.round((e.basicSalary||e.salary/2)*0.12) : 0;
-    const esic = e.esicApplicable ? Math.round(((e.salary-absentDed+fwTotal)*0.0075)) : 0;
-    const adv  = advances.filter(x=>x.empId===e.id&&x.status==='approved'&&
-      ((!x.deductionType||x.deductionType==='onetime')?(x.month===mName&&String(x.year)===String(y)):true)
-    ).reduce((s,x)=>s+(x.emiAmount||x.amount||0),0);
-    const net = Math.max(0, e.salary+fwTotal-absentDed-pf-esic-td-adv);
+    const net  = calcNetSalary(e, m, y, mName);
     const paidAmt = st.paidAmount||0;
     const statusBadge = st.status==='paid'
       ? `<span class="badge badge-green">✅ Paid</span>`
       : st.status==='locked'
       ? `<span class="badge badge-blue">🔒 Locked</span>`
       : `<span class="badge badge-gray">Draft</span>`;
-
     grandTotal += net;
     grandPaid  += paidAmt;
     rows += `<tr>
       <td><div class="td-name">${e.name}</div><div class="td-code">${e.id}</div></td>
       <td style="font-family:var(--mono);">₹${fmtN(e.salary)}</td>
-      <td style="font-family:var(--mono);color:var(--green);">₹${fmtN(net)}</td>
+      <td style="font-family:var(--mono);color:var(--green);font-weight:700;">₹${fmtN(net)}</td>
       <td>${statusBadge}</td>
       <td style="font-family:var(--mono);color:${paidAmt>0?'var(--green)':'var(--text3)'};">${paidAmt>0?'₹'+fmtN(paidAmt):'—'}</td>
       <td style="font-family:var(--mono);color:${net-paidAmt>0?'var(--red)':'var(--green)'};">₹${fmtN(net-paidAmt)}</td>
@@ -5088,41 +5108,9 @@ function genPayslips() {
 
   // ── Calculate net salary for each employee ──
   const slipData = targets.map(e => {
-    const key  = `${e.id}-${mName}-${y}`;
-    const st   = statuses[key]||{status:'draft'};
-    // Calculate net salary same as buildPayslipHTML
-    const att  = DB.getSync('attendance')||{};
-    const days = new Date(y,m,0).getDate();
-    let p=0,h=0,tc=0,td=0;
-    for(let d=1;d<=days;d++){
-      const k=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      const s=(att[k]||{})[e.id];
-      if(s==='P')p++;else if(s==='H')h++;
-      const comm=DB.getSync('commissions')||{};
-      const ded=DB.getSync('deductions')||{};
-      if(comm[k]?.[e.id]) tc+=comm[k][e.id];
-      if(ded[k]?.[e.id])  td+=ded[k][e.id];
-    }
-    const fw     = DB.getSync('fieldWork')||{};
-    const fwData = (fw[`${mName}-${y}`]||{})[e.id]||{};
-    const NO_COMM_IDS = ['BGT001'];
-    const isNoComm = NO_COMM_IDS.includes(e.id);
-    const pureTC   = Math.max(0,(fwData.tc||0)-(fwData.ec||0));
-    const ecComm   = isNoComm ? 0 : (fwData.ec||0)*400;
-    const topTotal = (!isNoComm&&(fwData.tc||0)>=30) ? pureTC*100 : 0;
-    const topTech  = Math.round(topTotal*0.70);
-    const ostComm  = isNoComm ? 0 : (fwData.ost||0)*300;
-    const fwTotal  = ecComm+topTech+ostComm;
-    const paidDays   = p+Math.floor(h/2);
-    const absentDays = Math.max(0,30-paidDays);
-    const absentDed  = Math.round(absentDays*(e.salary/30));
-    const pf   = e.pfApplicable   ? Math.round((e.basicSalary||e.salary/2)*0.12) : 0;
-    const esic = e.esicApplicable ? Math.round(((e.salary-absentDed+fwTotal)*0.0075)) : 0;
-    const adv  = (DB.getSync('salaryAdvances')||[]).filter(x=>
-      x.empId===e.id&&x.status==='approved'&&
-      ((!x.deductionType||x.deductionType==='onetime')?(x.month===mName&&String(x.year)===String(y)):true)
-    ).reduce((s,x)=>s+(x.emiAmount||x.amount||0),0);
-    const net = Math.max(0, e.salary + fwTotal - absentDed - pf - esic - td - adv);
+    const key = `${e.id}-${mName}-${y}`;
+    const st  = statuses[key]||{status:'draft'};
+    const net = calcNetSalary(e, m, y, mName);
     return {e, st, key, net};
   });
 
