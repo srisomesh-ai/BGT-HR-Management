@@ -5354,10 +5354,13 @@ function buildPayslipHTML(e,m,y,mName,slipStatus) {
   const fwTC   = fwData.tc||0;   // Tech GPS
   const fwOST  = fwData.ost||0;  // Outstation trips
 
-  const ecComm    = fwEC * 400;                          // ₹400 per eng/cut
-  const topTotal  = fwTC >= 30 ? fwTC * 100 : 0;        // ≥30 units bonus
+  const NO_COMM_IDS = ['BGT001'];
+  const isNoComm  = NO_COMM_IDS.includes(e.id);
+  const pureTC    = Math.max(0, fwTC - fwEC);            // EC excluded from ₹100 bonus
+  const ecComm    = isNoComm ? 0 : fwEC * 400;           // ₹400 per eng/cut
+  const topTotal  = (!isNoComm && fwTC >= 30) ? pureTC * 100 : 0; // ≥30 bonus on pure GPS only
   const topTech   = Math.round(topTotal * 0.70);         // 70% to tech
-  const ostComm   = fwOST * 300;                         // ₹300 fixed per trip
+  const ostComm   = isNoComm ? 0 : fwOST * 300;         // ₹300 fixed per trip
   const fwTotal   = ecComm + topTech + ostComm;          // total field commission
 
   // totalComm from fieldWork only — tc (commissions DB) is same data, don't add twice
