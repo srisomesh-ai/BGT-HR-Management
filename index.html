@@ -4984,26 +4984,107 @@ function genPayslips() {
   const targets = empId ? emps.filter(e=>e.id===empId) : emps;
   const statuses = DB.getSync('payslipStatus')||{};
 
+  // ── Calculate net salary for each employee ──
+  const slipData = targets.map(e => {
+    const key  = `${e.id}-${mName}-${y}`;
+    const st   = statuses[key]||{status:'draft'};
+    // Calculate net salary same as buildPayslipHTML
+    const att  = DB.getSync('attendance')||{};
+    const days = new Date(y,m,0).getDate();
+    let p=0,h=0,tc=0,td=0;
+    for(let d=1;d<=days;d++){
+      const k=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const s=(att[k]||{})[e.id];
+      if(s==='P')p++;else if(s==='H')h++;
+      const comm=DB.getSync('commissions')||{};
+      const ded=DB.getSync('deductions')||{};
+      if(comm[k]?.[e.id]) tc+=comm[k][e.id];
+      if(ded[k]?.[e.id])  td+=ded[k][e.id];
+    }
+    const fw     = DB.getSync('fieldWork')||{};
+    const fwData = (fw[`${mName}-${y}`]||{})[e.id]||{};
+    const NO_COMM_IDS = ['BGT001'];
+    const isNoComm = NO_COMM_IDS.includes(e.id);
+    const pureTC   = Math.max(0,(fwData.tc||0)-(fwData.ec||0));
+    const ecComm   = isNoComm ? 0 : (fwData.ec||0)*400;
+    const topTotal = (!isNoComm&&(fwData.tc||0)>=30) ? pureTC*100 : 0;
+    const topTech  = Math.round(topTotal*0.70);
+    const ostComm  = isNoComm ? 0 : (fwData.ost||0)*300;
+    const fwTotal  = ecComm+topTech+ostComm;
+    const paidDays   = p+Math.floor(h/2);
+    const absentDays = Math.max(0,30-paidDays);
+    const absentDed  = Math.round(absentDays*(e.salary/30));
+    const pf   = e.pfApplicable   ? Math.round((e.basicSalary||e.salary/2)*0.12) : 0;
+    const esic = e.esicApplicable ? Math.round(((e.salary-absentDed+fwTotal)*0.0075)) : 0;
+    const adv  = (DB.getSync('salaryAdvances')||[]).filter(x=>
+      x.empId===e.id&&x.status==='approved'&&
+      ((!x.deductionType||x.deductionType==='onetime')?(x.month===mName&&String(x.year)===String(y)):true)
+    ).reduce((s,x)=>s+(x.emiAmount||x.amount||0),0);
+    const net = Math.max(0, e.salary + fwTotal - absentDed - pf - esic - td - adv);
+    return {e, st, key, net};
+  });
+
+  // ── Summary bar ──
+  const totalSalary  = slipData.reduce((s,d)=>s+d.net,0);
+  const lockedSlips  = slipData.filter(d=>d.st.status==='locked'||d.st.status==='paid');
+  const paidSlips    = slipData.filter(d=>d.st.status==='paid');
+  const totalLocked  = lockedSlips.reduce((s,d)=>s+d.net,0);
+  const totalPaid    = paidSlips.reduce((s,d)=>s+(d.st.paidAmount||d.net),0);
+  const totalBalance = totalLocked - totalPaid;
+
   const out = document.getElementById('ps-output');
-  out.innerHTML = targets.map(e => {
-    const key    = `${e.id}-${mName}-${y}`;
-    const st     = statuses[key]||{status:'draft'};
+
+  // Summary strip
+  const summaryHtml = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);">
+    <div style="text-align:center;">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Total Payable</div>
+      <div style="font-size:20px;font-weight:800;color:var(--primary);">₹${fmtN(totalSalary)}</div>
+      <div style="font-size:11px;color:var(--text3);">${slipData.length} employee${slipData.length!==1?'s':''}</div>
+    </div>
+    <div style="text-align:center;border-left:1px solid var(--border);">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">🔒 Locked</div>
+      <div style="font-size:20px;font-weight:800;color:#1c3faa;">₹${fmtN(totalLocked)}</div>
+      <div style="font-size:11px;color:var(--text3);">${lockedSlips.length} slip${lockedSlips.length!==1?'s':''}</div>
+    </div>
+    <div style="text-align:center;border-left:1px solid var(--border);">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">✅ Paid</div>
+      <div style="font-size:20px;font-weight:800;color:var(--green);">₹${fmtN(totalPaid)}</div>
+      <div style="font-size:11px;color:var(--text3);">${paidSlips.length} employee${paidSlips.length!==1?'s':''}</div>
+    </div>
+    <div style="text-align:center;border-left:1px solid var(--border);">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">⏳ Balance</div>
+      <div style="font-size:20px;font-weight:800;color:${totalBalance>0?'var(--red)':'var(--green)'};">₹${fmtN(totalBalance)}</div>
+      <div style="font-size:11px;color:var(--text3);">${totalBalance>0?'Pending payment':'All paid'}</div>
+    </div>
+  </div>`;
+
+  out.innerHTML = summaryHtml + slipData.map(({e, st, key, net}) => {
     const isLocked = st.status==='locked'||st.status==='paid';
     const isPaid   = st.status==='paid';
+    const paidAmt  = st.paidAmount||net;
+    const balance  = net - paidAmt;
 
     const actionBarHtml = isPaid
-      ? `<span style="padding:8px 16px;background:#dcfdf0;color:#0d9e6a;border-radius:8px;font-weight:700;font-size:13px;">✅ Salary Paid — ${st.paidAt||''} ${st.utr?'| Ref: '+st.utr:''}</span>
-         <button class="btn btn-secondary btn-sm" onclick="printSlip('${e.id}','${mName}','${y}')">🖨️ Print</button>`
+      ? `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+           <span style="padding:8px 16px;background:#dcfdf0;color:#0d9e6a;border-radius:8px;font-weight:700;font-size:13px;">✅ Paid — ${st.paidAt||''} ${st.utr?'| Ref: '+st.utr:''}</span>
+           <span style="padding:8px 14px;background:#dcfdf0;border-radius:8px;font-size:13px;color:#0d9e6a;">💰 Paid: ₹${fmtN(paidAmt)}</span>
+           ${balance>0?`<span style="padding:8px 14px;background:var(--red-bg);border-radius:8px;font-size:13px;color:var(--red);font-weight:700;">⏳ Balance: ₹${fmtN(balance)}</span>`:''}
+           <button class="btn btn-secondary btn-sm" onclick="printSlip('${e.id}','${mName}','${y}')">🖨️ Print</button>
+         </div>`
       : isLocked
-      ? `<span style="padding:8px 16px;background:#eef2ff;color:#1c3faa;border-radius:8px;font-weight:700;font-size:13px;">🔒 Locked — ${st.lockedAt||''}</span>
-         <button class="btn btn-success btn-sm" onclick="markSlipPaid('${e.id}','${mName}','${y}')">✅ Mark as Paid</button>
-         <button class="btn btn-secondary btn-sm" onclick="printSlip('${e.id}','${mName}','${y}')">🖨️ Print</button>
-         <button class="btn btn-secondary btn-sm" onclick="unlockSlip('${e.id}','${mName}','${y}')">🔓 Unlock</button>`
-      : `<button class="btn btn-primary btn-sm" onclick="lockSlip('${e.id}','${mName}','${y}')">🔒 Lock & Finalise</button>
-         <button class="btn btn-secondary btn-sm" onclick="printSlip('${e.id}','${mName}','${y}')">🖨️ Print</button>`;
+      ? `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+           <span style="padding:8px 16px;background:#eef2ff;color:#1c3faa;border-radius:8px;font-weight:700;font-size:13px;">🔒 Locked — ₹${fmtN(net)} to pay</span>
+           <button class="btn btn-success btn-sm" onclick="markSlipPaid('${e.id}','${mName}','${y}',${net})">✅ Mark as Paid</button>
+           <button class="btn btn-secondary btn-sm" onclick="printSlip('${e.id}','${mName}','${y}')">🖨️ Print</button>
+           <button class="btn btn-secondary btn-sm" onclick="unlockSlip('${e.id}','${mName}','${y}')">🔓 Unlock</button>
+         </div>`
+      : `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+           <button class="btn btn-primary btn-sm" onclick="lockSlip('${e.id}','${mName}','${y}')">🔒 Lock & Finalise</button>
+           <button class="btn btn-secondary btn-sm" onclick="printSlip('${e.id}','${mName}','${y}')">🖨️ Print</button>
+         </div>`;
 
     return `<div style="margin-bottom:28px;">` + buildPayslipHTML(e,m,y,mName,st) +
-      `<div id="slip-bar-${e.id}" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 0 0;">${actionBarHtml}</div></div>`;
+      `<div id="slip-bar-${e.id}" style="padding:10px 0 0;">${actionBarHtml}</div></div>`;
   }).join('');
 }
 
@@ -5035,23 +5116,41 @@ function _updateSlipActionBar(empId, mName, y, st) {
   if(!bar) return;
   const isPaid   = st.status==='paid';
   const isLocked = st.status==='locked'||isPaid;
+  const paidAmt = st.paidAmount||st.netAmount||0;
+  const netAmt2 = st.netAmount||st.paidAmount||0;
+  const balance = Math.max(0, netAmt2 - paidAmt);
   bar.innerHTML = isPaid
-    ? `<span style="padding:8px 16px;background:#dcfdf0;color:#0d9e6a;border-radius:8px;font-weight:700;font-size:13px;">✅ Salary Paid — ${st.paidAt||''} ${st.utr?'| Ref: '+st.utr:''}</span>
-       <button class="btn btn-secondary btn-sm" onclick="printSlip('${empId}','${mName}','${y}')">🖨️ Print</button>`
+    ? `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+         <span style="padding:8px 16px;background:#dcfdf0;color:#0d9e6a;border-radius:8px;font-weight:700;font-size:13px;">✅ Paid — ${st.paidAt||''} ${st.utr?'| Ref: '+st.utr:''}</span>
+         <span style="padding:8px 14px;background:#dcfdf0;border-radius:8px;font-size:13px;color:#0d9e6a;">💰 Paid: ₹${fmtN(paidAmt)}</span>
+         ${balance>0?`<span style="padding:8px 14px;background:var(--red-bg);border-radius:8px;font-size:13px;color:var(--red);font-weight:700;">⏳ Balance: ₹${fmtN(balance)}</span>`:''}
+         <button class="btn btn-secondary btn-sm" onclick="printSlip('${empId}','${mName}','${y}')">🖨️ Print</button>
+       </div>`
     : isLocked
-    ? `<span style="padding:8px 16px;background:#eef2ff;color:#1c3faa;border-radius:8px;font-weight:700;font-size:13px;">🔒 Locked — ${st.lockedAt||''}</span>
-       <button class="btn btn-success btn-sm" onclick="markSlipPaid('${empId}','${mName}','${y}')">✅ Mark as Paid</button>
-       <button class="btn btn-secondary btn-sm" onclick="printSlip('${empId}','${mName}','${y}')">🖨️ Print</button>
-       <button class="btn btn-secondary btn-sm" onclick="unlockSlip('${empId}','${mName}','${y}')">🔓 Unlock</button>`
-    : `<button class="btn btn-primary btn-sm" onclick="lockSlip('${empId}','${mName}','${y}')">🔒 Lock & Finalise</button>
-       <button class="btn btn-secondary btn-sm" onclick="printSlip('${empId}','${mName}','${y}')">🖨️ Print</button>`;
+    ? `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+         <span style="padding:8px 16px;background:#eef2ff;color:#1c3faa;border-radius:8px;font-weight:700;font-size:13px;">🔒 Locked — ₹${fmtN(netAmt2||0)} to pay</span>
+         <button class="btn btn-success btn-sm" onclick="markSlipPaid('${empId}','${mName}','${y}',${netAmt2||0})">✅ Mark as Paid</button>
+         <button class="btn btn-secondary btn-sm" onclick="printSlip('${empId}','${mName}','${y}')">🖨️ Print</button>
+         <button class="btn btn-secondary btn-sm" onclick="unlockSlip('${empId}','${mName}','${y}')">🔓 Unlock</button>
+       </div>`
+    : `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+         <button class="btn btn-primary btn-sm" onclick="lockSlip('${empId}','${mName}','${y}')">🔒 Lock & Finalise</button>
+         <button class="btn btn-secondary btn-sm" onclick="printSlip('${empId}','${mName}','${y}')">🖨️ Print</button>
+       </div>`;
 }
 
-function markSlipPaid(empId, mName, y) {
+function markSlipPaid(empId, mName, y, netAmt) {
+  const amt = netAmt||0;
   openModal('✅ Mark Salary as Paid', `
     <div style="margin-bottom:16px;">
       <div style="padding:10px 14px;background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--radius);font-size:13px;color:var(--green);font-weight:600;margin-bottom:14px;">
-        Confirming payment for <strong>${empId}</strong> — ${mName} ${y}
+        Confirming payment for <strong>${empId}</strong> — ${mName} ${y}<br>
+        <span style="font-size:18px;font-weight:800;">Net Salary: ₹${fmtN(amt)}</span>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label class="form-label">Amount Paid (₹) *</label>
+        <input class="form-input" type="number" id="paid-amount" value="${amt}" min="1">
+        <div style="font-size:11px;color:var(--text3);margin-top:4px;">If partial, enter amount paid — balance will be tracked.</div>
       </div>
       <div class="form-group" style="margin-bottom:12px;">
         <label class="form-label">Payment Date *</label>
@@ -5064,13 +5163,14 @@ function markSlipPaid(empId, mName, y) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-success" onclick="confirmSlipPaid('${empId}','${mName}','${y}')">✅ Confirm Payment</button>
+      <button class="btn btn-success" onclick="confirmSlipPaid('${empId}','${mName}','${y}',${amt})">✅ Confirm Payment</button>
     </div>`);
 }
 
-function confirmSlipPaid(empId, mName, y) {
-  const paidDate = document.getElementById('paid-date')?.value;
-  const utr      = document.getElementById('paid-utr')?.value?.trim();
+function confirmSlipPaid(empId, mName, y, netAmt) {
+  const paidDate  = document.getElementById('paid-date')?.value;
+  const utr       = document.getElementById('paid-utr')?.value?.trim();
+  const paidAmount= parseFloat(document.getElementById('paid-amount')?.value)||netAmt||0;
   if(!paidDate){ showToast('Select payment date','error'); return; }
   const key  = `${empId}-${mName}-${y}`;
   const st   = DB.getSync('payslipStatus')||{};
@@ -5098,12 +5198,14 @@ function confirmSlipPaid(empId, mName, y) {
   const netSalary = (emp.salary||0) + fwTotal - Math.round(absentDays*((emp.salary||0)/30));
 
   st[key] = {
-    status:   'paid',
-    lockedBy: st[key]?.lockedBy||currentUser.username,
-    lockedAt: st[key]?.lockedAt||new Date().toISOString().slice(0,10),
-    paidBy:   currentUser.username,
-    paidAt:   paidDate,
-    utr:      utr||''
+    status:      'paid',
+    lockedBy:    st[key]?.lockedBy||currentUser.username,
+    lockedAt:    st[key]?.lockedAt||new Date().toISOString().slice(0,10),
+    paidBy:      currentUser.username,
+    paidAt:      paidDate,
+    utr:         utr||'',
+    paidAmount:  paidAmount,
+    netAmount:   netAmt||paidAmount
   };
   window._suppressRender = true;
   DB.setSync('payslipStatus', st);
