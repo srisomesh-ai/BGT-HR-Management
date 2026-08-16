@@ -4969,10 +4969,112 @@ function renderPayslipPage() {
           </select>
         </div>
         <button class="btn btn-primary" onclick="genPayslips()">🧾 Generate Payslips</button>
+        <button class="btn btn-secondary" onclick="showSalaryTotal()">💰 Show Total</button>
       </div>
     </div>
+    <div id="ps-total-bar"></div>
     <div id="ps-output"></div>
   </div></div>`;
+}
+
+function showSalaryTotal() {
+  const m     = parseInt(document.getElementById('ps-m').value);
+  const y     = parseInt(document.getElementById('ps-y').value);
+  const mName = ['','January','February','March','April','May','June','July','August','September','October','November','December'][m];
+  const emps  = (DB.getSync('employees')||[]).filter(e=>e.status==='active');
+  const statuses = DB.getSync('payslipStatus')||{};
+  const att   = DB.getSync('attendance')||{};
+  const comm  = DB.getSync('commissions')||{};
+  const ded   = DB.getSync('deductions')||{};
+  const fw    = DB.getSync('fieldWork')||{};
+  const advances = DB.getSync('salaryAdvances')||[];
+  const NO_COMM_IDS = ['BGT001'];
+  const days  = new Date(y,m,0).getDate();
+
+  let rows = '';
+  let grandTotal = 0;
+  let grandPaid  = 0;
+
+  emps.forEach(e => {
+    const key  = `${e.id}-${mName}-${y}`;
+    const st   = statuses[key]||{status:'draft'};
+    let p=0,h=0,tc=0,td=0;
+    for(let d=1;d<=days;d++){
+      const k=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const s=(att[k]||{})[e.id];
+      if(s==='P')p++;else if(s==='H')h++;
+      if(comm[k]?.[e.id]) tc+=comm[k][e.id];
+      if(ded[k]?.[e.id])  td+=ded[k][e.id];
+    }
+    const fwData  = (fw[`${mName}-${y}`]||{})[e.id]||{};
+    const isNoComm= NO_COMM_IDS.includes(e.id);
+    const pureTC  = Math.max(0,(fwData.tc||0)-(fwData.ec||0));
+    const ecComm  = isNoComm?0:(fwData.ec||0)*400;
+    const topTech = Math.round(((!isNoComm&&(fwData.tc||0)>=30)?pureTC*100:0)*0.70);
+    const ostComm = isNoComm?0:(fwData.ost||0)*300;
+    const fwTotal = ecComm+topTech+ostComm;
+    const paidDays   = p+Math.floor(h/2);
+    const absentDays = Math.max(0,30-paidDays);
+    const absentDed  = Math.round(absentDays*(e.salary/30));
+    const pf   = e.pfApplicable   ? Math.round((e.basicSalary||e.salary/2)*0.12) : 0;
+    const esic = e.esicApplicable ? Math.round(((e.salary-absentDed+fwTotal)*0.0075)) : 0;
+    const adv  = advances.filter(x=>x.empId===e.id&&x.status==='approved'&&
+      ((!x.deductionType||x.deductionType==='onetime')?(x.month===mName&&String(x.year)===String(y)):true)
+    ).reduce((s,x)=>s+(x.emiAmount||x.amount||0),0);
+    const net = Math.max(0, e.salary+fwTotal-absentDed-pf-esic-td-adv);
+    const paidAmt = st.paidAmount||0;
+    const statusBadge = st.status==='paid'
+      ? `<span class="badge badge-green">✅ Paid</span>`
+      : st.status==='locked'
+      ? `<span class="badge badge-blue">🔒 Locked</span>`
+      : `<span class="badge badge-gray">Draft</span>`;
+
+    grandTotal += net;
+    grandPaid  += paidAmt;
+    rows += `<tr>
+      <td><div class="td-name">${e.name}</div><div class="td-code">${e.id}</div></td>
+      <td style="font-family:var(--mono);">₹${fmtN(e.salary)}</td>
+      <td style="font-family:var(--mono);color:var(--green);">₹${fmtN(net)}</td>
+      <td>${statusBadge}</td>
+      <td style="font-family:var(--mono);color:${paidAmt>0?'var(--green)':'var(--text3)'};">${paidAmt>0?'₹'+fmtN(paidAmt):'—'}</td>
+      <td style="font-family:var(--mono);color:${net-paidAmt>0?'var(--red)':'var(--green)'};">₹${fmtN(net-paidAmt)}</td>
+    </tr>`;
+  });
+
+  const balance = grandTotal - grandPaid;
+  document.getElementById('ps-total-bar').innerHTML = `
+    <div style="margin-bottom:16px;">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px;padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);">
+        <div style="text-align:center;">
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Total Salary Payable</div>
+          <div style="font-size:26px;font-weight:800;color:var(--primary);">₹${fmtN(grandTotal)}</div>
+          <div style="font-size:11px;color:var(--text3);">${emps.length} employees — ${mName} ${y}</div>
+        </div>
+        <div style="text-align:center;border-left:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">✅ Total Paid</div>
+          <div style="font-size:26px;font-weight:800;color:var(--green);">₹${fmtN(grandPaid)}</div>
+        </div>
+        <div style="text-align:center;border-left:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">⏳ Balance Remaining</div>
+          <div style="font-size:26px;font-weight:800;color:${balance>0?'var(--red)':'var(--green)'};">₹${fmtN(balance)}</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="table-wrap" style="border:none;">
+          <table>
+            <thead><tr><th>Employee</th><th>Gross Salary</th><th>Net Payable</th><th>Status</th><th>Paid</th><th>Balance</th></tr></thead>
+            <tbody>${rows}</tbody>
+            <tfoot><tr style="background:var(--bg2);font-weight:800;">
+              <td colspan="2">TOTAL</td>
+              <td style="font-family:var(--mono);color:var(--primary);">₹${fmtN(grandTotal)}</td>
+              <td></td>
+              <td style="font-family:var(--mono);color:var(--green);">₹${fmtN(grandPaid)}</td>
+              <td style="font-family:var(--mono);color:${balance>0?'var(--red)':'var(--green)'};">₹${fmtN(balance)}</td>
+            </tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>`;
 }
 
 function genPayslips() {
