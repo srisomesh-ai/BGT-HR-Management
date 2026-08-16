@@ -4970,6 +4970,7 @@ function renderPayslipPage() {
         </div>
         <button class="btn btn-primary" onclick="genPayslips()">🧾 Generate Payslips</button>
         <button class="btn btn-secondary" onclick="showSalaryTotal()">💰 Show Total</button>
+        <button class="btn btn-secondary" onclick="showPaymentPriority()">🏆 Payment Priority</button>
       </div>
     </div>
     <div id="ps-total-bar"></div>
@@ -5026,6 +5027,133 @@ function calcNetSalary(e, m, y, mName) {
   }).reduce((s,x)=>s+(x.emiAmount||0),0);
   const adv = advOnetime + advMonthly;
   return Math.max(0, e.salary + fwTotal - absentDed - pf - esic - td - adv);
+}
+
+function showPaymentPriority() {
+  const m        = parseInt(document.getElementById('ps-m').value);
+  const y        = parseInt(document.getElementById('ps-y').value);
+  const mName    = ['','January','February','March','April','May','June','July','August','September','October','November','December'][m];
+  const emps     = (DB.getSync('employees')||[]).filter(e=>e.status==='active');
+  const statuses = DB.getSync('payslipStatus')||{};
+  const fw       = DB.getSync('fieldWork')||{};
+  const fwMonth  = fw[`${mName}-${y}`]||{};
+  const NO_COMM_IDS = ['BGT001'];
+
+  // Build priority list
+  const list = emps.map(e => {
+    const key       = `${e.id}-${mName}-${y}`;
+    const st        = statuses[key]||{status:'draft'};
+    const fwData    = fwMonth[e.id]||{};
+    const totalInst = (fwData.mt||0) + (fwData.tc||0); // total installations
+    const net       = calcNetSalary(e, m, y, mName);
+    const isPaid    = st.status==='paid';
+    const isNoComm  = NO_COMM_IDS.includes(e.id);
+    return {e, st, key, net, totalInst, isPaid, isNoComm};
+  });
+
+  // Sort: paid last, then by installations DESC, office staff (0 installs) last
+  list.sort((a, b) => {
+    if(a.isPaid !== b.isPaid) return a.isPaid ? 1 : -1; // paid go to bottom
+    if(b.totalInst !== a.totalInst) return b.totalInst - a.totalInst; // higher installs first
+    return 0;
+  });
+
+  let rows = '';
+  let totalPayable  = 0;
+  let totalPaid     = 0;
+  let totalBalance  = 0;
+
+  list.forEach((item, idx) => {
+    const {e, st, key, net, totalInst, isPaid} = item;
+    const paidAmt  = st.paidAmount||0;
+    const balance  = net - paidAmt;
+    totalPayable  += net;
+    totalPaid     += paidAmt;
+    totalBalance  += balance;
+
+    const rank = isPaid
+      ? `<span style="font-size:18px;">✅</span>`
+      : `<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:${idx===0?'#f7c948':idx===1?'#c0c0c0':idx===2?'#cd7f32':'var(--bg2)'};color:${idx<3?'#fff':'var(--text2)'};border-radius:50%;font-weight:800;font-size:13px;">${idx+1}</span>`;
+
+    const instBadge = totalInst > 0
+      ? `<span class="badge badge-blue">${totalInst} installs</span>`
+      : `<span class="badge badge-gray">Office</span>`;
+
+    const statusBadge = isPaid
+      ? `<span class="badge badge-green">✅ Paid</span>`
+      : st.status==='locked'
+      ? `<span class="badge badge-blue">🔒 Locked</span>`
+      : `<span class="badge badge-gray">Draft</span>`;
+
+    const actionBtn = isPaid
+      ? `<span style="font-size:12px;color:var(--green);font-weight:600;">✅ Done</span>`
+      : `<button class="btn btn-success btn-xs" onclick="markSlipPaid('${e.id}','${mName}','${y}',${net})">💳 Pay Now</button>`;
+
+    rows += `<tr style="${isPaid?'opacity:0.5;':''}">
+      <td style="text-align:center;">${rank}</td>
+      <td><div class="td-name">${e.name}</div><div class="td-code">${e.id}</div></td>
+      <td>${instBadge}</td>
+      <td style="font-family:var(--mono);font-weight:700;color:var(--primary);">₹${fmtN(net)}</td>
+      <td>${statusBadge}</td>
+      <td style="font-family:var(--mono);color:${balance>0?'var(--red)':'var(--green)'};">₹${fmtN(balance)}</td>
+      <td>${actionBtn}</td>
+    </tr>`;
+  });
+
+  const paidCount = list.filter(x=>x.isPaid).length;
+  const pendingCount = list.length - paidCount;
+
+  document.getElementById('ps-total-bar').innerHTML = `
+    <div style="margin-bottom:16px;">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);">
+        <div style="text-align:center;">
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Total Payable</div>
+          <div style="font-size:22px;font-weight:800;color:var(--primary);">₹${fmtN(totalPayable)}</div>
+          <div style="font-size:11px;color:var(--text3);">${emps.length} employees</div>
+        </div>
+        <div style="text-align:center;border-left:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">✅ Paid</div>
+          <div style="font-size:22px;font-weight:800;color:var(--green);">₹${fmtN(totalPaid)}</div>
+          <div style="font-size:11px;color:var(--text3);">${paidCount} employees</div>
+        </div>
+        <div style="text-align:center;border-left:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">⏳ Remaining</div>
+          <div style="font-size:22px;font-weight:800;color:var(--red);">₹${fmtN(totalBalance)}</div>
+          <div style="font-size:11px;color:var(--text3);">${pendingCount} pending</div>
+        </div>
+        <div style="text-align:center;border-left:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Progress</div>
+          <div style="font-size:22px;font-weight:800;color:var(--primary);">${Math.round(paidCount/list.length*100)}%</div>
+          <div style="font-size:11px;color:var(--text3);">salary disbursed</div>
+        </div>
+      </div>
+      <div style="padding:10px 14px;background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--radius);margin-bottom:12px;font-size:13px;color:var(--amber);font-weight:600;">
+        🏆 Pay in this order — highest installations first (top revenue generators). Office staff paid last.
+      </div>
+      <div class="card">
+        <div class="table-wrap" style="border:none;">
+          <table>
+            <thead><tr>
+              <th style="text-align:center;width:48px;">Rank</th>
+              <th>Employee</th>
+              <th>Installations</th>
+              <th>Net Salary</th>
+              <th>Status</th>
+              <th>Balance</th>
+              <th>Action</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+            <tfoot><tr style="background:var(--bg2);font-weight:800;">
+              <td colspan="3">TOTAL</td>
+              <td style="font-family:var(--mono);color:var(--primary);">₹${fmtN(totalPayable)}</td>
+              <td></td>
+              <td style="font-family:var(--mono);color:var(--red);">₹${fmtN(totalBalance)}</td>
+              <td></td>
+            </tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>`;
 }
 
 function showSalaryTotal() {
