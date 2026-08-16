@@ -5279,9 +5279,12 @@ function confirmSlipPaid(empId, mName, y, netAmt) {
   }
   const fw = DB.getSync('fieldWork')||{};
   const fwData = (fw[`${mName}-${y}`]||{})[empId]||{};
-  const ecComm  = (fwData.ec||0)*400;
-  const topTech = Math.round(((fwData.tc||0)>=30?(fwData.tc||0)*100:0)*0.70);
-  const ostComm = (fwData.ost||0)*300;
+  const NO_COMM_IDS_P = ['BGT001'];
+  const isNoCom = NO_COMM_IDS_P.includes(empId);
+  const _pureTC  = Math.max(0,(fwData.tc||0)-(fwData.ec||0));
+  const ecComm  = isNoCom ? 0 : (fwData.ec||0)*400;
+  const topTech = isNoCom ? 0 : Math.round(((fwData.tc||0)>=30?_pureTC*100:0)*0.70);
+  const ostComm = isNoCom ? 0 : (fwData.ost||0)*300;
   const fwTotal = ecComm+topTech+ostComm;
   const paidDays = p+Math.floor(h/2);
   const absentDays = Math.max(0,30-paidDays);
@@ -5734,12 +5737,15 @@ function exportMonthlyExcel() {
     const d = mFW[e.id]||{};
     const halfDay = 300; // Fixed ₹300 per outstation trip
     const mt=d.mt||0, ec=d.ec||0, tc=d.tc||0, ost=d.ost||0;
-    const topTotal = tc>=30?tc*100:0;
-    const topTech  = Math.round(topTotal*0.70);
-    const ostAmt   = ost*halfDay;
-    const techEarned = ec*400+topTech+ostAmt; // mt: no commission
-    const totalComm  = monthComm[e.id]||techEarned;
-    const netPayable = e.salary+totalComm;
+    const NO_COMM_IDS_X = ['BGT001'];
+    const isNoCX    = NO_COMM_IDS_X.includes(e.id);
+    const pureTC_x  = Math.max(0, tc - ec);
+    const topTotal  = (!isNoCX && tc>=30) ? pureTC_x*100 : 0;
+    const topTech   = Math.round(topTotal*0.70);
+    const ostAmt    = isNoCX ? 0 : ost*halfDay;
+    const techEarned= isNoCX ? 0 : ec*400+topTech+ostAmt; // mt: no commission, BGT001: no commission
+    const totalComm = monthComm[e.id]||techEarned;
+    const netPayable= e.salary+totalComm;
     fwRows.push([e.id, e.name, e.designation, mt, ec, tc, ost, ostAmt, topTech, totalComm, e.salary, netPayable]);
   });
 
