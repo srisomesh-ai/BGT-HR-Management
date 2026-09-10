@@ -1154,7 +1154,46 @@ function initApp() {
     const changed=await DB.loadAll();
     if(changed){renderSidebar();renderPage(currentPage);}
     _startFirebaseListener();
+    // Auto-backup once per day on login
+    const lastBackup = localStorage.getItem('bghr_last_backup_date');
+    const today = new Date().toISOString().slice(0,10);
+    if(lastBackup !== today) {
+      setTimeout(()=>_autoBackupToHostinger(today), 5000); // 5s after login
+    }
   });
+}
+
+// ── Auto backup to Hostinger ──────────────────────────
+async function _autoBackupToHostinger(today) {
+  try {
+    const keys = ['employees','attendance','attComments','salaryAdvances','approvals',
+      'deductions','fieldWork','amendHistory','backDateRequests','leaveRequests',
+      'docApprovals','userPasswords','adminActionLog','empPasswords','empClaims','payslipStatus'];
+    const backup = {_savedBy: currentUser?.username||'auto'};
+    keys.forEach(k => { const v=DB.getSync(k); if(v!==null) backup[k]=v; });
+
+    const resp = await fetch('https://floralwhite-locust-819146.hostingersite.com/save-backup.php', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(backup)
+    });
+    const result = await resp.json();
+    if(result.ok) {
+      localStorage.setItem('bghr_last_backup_date', today);
+      console.log('[HR] ✅ Daily backup saved to Hostinger:', result.saved);
+      showToast('💾 Daily backup saved to Hostinger','success');
+    } else {
+      console.warn('[HR] Backup failed:', result.failed);
+    }
+  } catch(e) {
+    console.warn('[HR] Backup error:', e.message);
+  }
+}
+
+async function manualBackupToHostinger() {
+  showToast('⏳ Saving backup to Hostinger...','info');
+  const today = new Date().toISOString().slice(0,10);
+  await _autoBackupToHostinger(today);
 }
 
 async function syncToServer() {
@@ -3043,6 +3082,7 @@ function renderAdminTools() {
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button class="btn btn-primary btn-sm" onclick="DB.pushAll()">☁️ Force Push to Firebase</button>
         <button class="btn btn-secondary btn-sm" onclick="DB.loadAll().then(()=>{renderSidebar();renderPage(currentPage);showToast('Refreshed from Firebase ✓','success');})">🔄 Pull from Firebase</button>
+        <button class="btn btn-success btn-sm" onclick="manualBackupToHostinger()">💾 Backup to Hostinger Now</button>
       </div>
     </div>
     <div class="card card-pad" style="margin-bottom:20px;border-left:4px solid var(--red);">
