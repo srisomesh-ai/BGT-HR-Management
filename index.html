@@ -4367,13 +4367,14 @@ function renderLeaveRequestsAdmin() {
 
     // ── Auto-mark attendance as L for approved leave dates ──
     const req = all[idx];
-    if(req.fromDate) {
-      // Wait for Firebase to be ready before reading/writing attendance
-      const _markLeaveAtt = () => {
+    if(req.fromDate && _fbReady) {
+      DB.loadAll().then(()=>{
         const att  = DB.getSync('attendance')||{};
-        // Safety check — if att is empty and Firebase not ready, don't write
-        if(Object.keys(att).length === 0 && !_fbReady) {
-          console.warn('[HR] Skipping attendance mark — Firebase not ready');
+        const attDates = Object.keys(att);
+        // Safety: only write if we have substantial attendance data loaded
+        if(attDates.length === 0) {
+          console.warn('[HR] Skipping attendance mark — attendance data not loaded, preventing data loss');
+          showToast('⚠️ Leave approved but attendance not auto-marked — Firebase not ready. Please mark manually.','info');
           return;
         }
         const from = new Date(req.fromDate);
@@ -4384,12 +4385,8 @@ function renderLeaveRequestsAdmin() {
           att[key][req.empId] = 'L';
         }
         DB.setSync('attendance', att);
-      };
-      if(_fbReady) {
-        _markLeaveAtt();
-      } else {
-        _loadFirebase().then(()=>DB.loadAll()).then(()=>_markLeaveAtt());
-      }
+        showToast('✅ Attendance marked as Leave for approved dates','success');
+      });
     }
 
     renderSidebar(); renderPage('leave_requests'); showToast('✅ Leave approved and attendance updated','success');
