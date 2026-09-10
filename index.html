@@ -3033,24 +3033,16 @@ function renderAdminTools() {
   </div>
   <div class="page-body" style="padding-top:8px;">
 
-    <!-- SERVER SYNC STATUS -->
-    <div class="card card-pad" style="margin-bottom:20px;border-left:4px solid var(--primary);">
-      <div class="card-title">🌐 Server Sync — Data Sharing Across All Devices</div>
-      ${API_URL ? `
-      <div class="ok" style="padding:12px 16px;background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--radius);margin-bottom:14px;">
-        <strong>✅ Server connected:</strong> <code style="font-size:12px;">${API_URL}</code><br>
-        <span style="font-size:13px;color:var(--text2);">All data is shared in real-time across all devices and locations. Syncs every 6 seconds.</span>
-      </div>` : `
-      <div style="padding:12px 16px;background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--radius);margin-bottom:14px;">
-        <strong>⚠️ Server not connected — data is device-local only.</strong><br>
-        <span style="font-size:13px;color:var(--text2);">To share data across all devices, set <code>API_URL</code> in index.html and upload <code>api.php</code> to your server. See SETUP.html for instructions.</span>
-      </div>`}
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <button class="btn btn-primary btn-sm" onclick="DB.pushAll()">📤 Push All Local Data to Server</button>
-        <button class="btn btn-secondary btn-sm" onclick="DB.loadAll().then(()=>{renderSidebar();renderPage(currentPage);showToast('Refreshed from server ✓','success');})">🔄 Pull Latest from Server</button>
+    <!-- FIREBASE SYNC STATUS -->
+    <div class="card card-pad" style="margin-bottom:20px;border-left:4px solid var(--green);">
+      <div class="card-title">☁️ Firebase Sync — Data Sharing Across All Devices</div>
+      <div style="padding:12px 16px;background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--radius);margin-bottom:14px;">
+        <strong>✅ Firebase connected — data synced across all devices in real-time.</strong><br>
+        <span style="font-size:13px;color:var(--text2);">All attendance, payroll and employee data is stored securely in Firebase and shared instantly across all devices.</span>
       </div>
-      <div style="margin-top:10px;font-size:12.5px;color:var(--text3);">
-        Use "Push All" once when first setting up the server — it migrates all your existing data. After that, data syncs automatically.
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" onclick="DB.pushAll()">☁️ Force Push to Firebase</button>
+        <button class="btn btn-secondary btn-sm" onclick="DB.loadAll().then(()=>{renderSidebar();renderPage(currentPage);showToast('Refreshed from Firebase ✓','success');})">🔄 Pull from Firebase</button>
       </div>
     </div>
     <div class="card card-pad" style="margin-bottom:20px;border-left:4px solid var(--red);">
